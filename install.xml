@@ -1,0 +1,15 @@
+<install>
+	<name>ofxSQLite</name>
+	<version>0.01</version>
+	<author>Diederick Huijbers</author>
+	<description><![CDATA[Simple wrapper around sqlite.]]>
+	<url></url>
+	<add>
+		<include>
+			
+			<path>..\..\..\addons_diederick\ofxSQlite\src\</path>
+			<path>..\..\..\addons_diederick\ofxSQLite\src\lib\*</path>
+			
+		</include>
+	</add>
+</install>
