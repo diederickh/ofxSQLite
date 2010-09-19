@@ -8,7 +8,7 @@
 #include "ofxSQLiteType.h"
 #include "ofxSQLiteTypeNow.h"
 #include <iostream>
-
+#include <stdio.h>
 
 
 struct FieldValuePair {
@@ -63,7 +63,7 @@ class ofxSQLiteFieldValues {
 		void next();
 		bool hasNext();
 		int size();
-		
+
 	private:
 		std::vector<FieldValuePair> field_values;
 		int nextFieldIndex();
