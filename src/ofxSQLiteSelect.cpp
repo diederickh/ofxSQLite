@@ -138,7 +138,7 @@ std::string ofxSQLiteSelect::getString(int nIndex) {
 	int use_index = nIndex;
 	if(use_index == -1)
 		use_index = col_index++;
-		
+	
 	std::stringstream ss;
 	ss << sqlite3_column_text(statement, use_index);
 	return ss.str();
@@ -152,4 +152,14 @@ int ofxSQLiteSelect::getInt(int nIndex) {
 	if(use_index == -1)
 		use_index = col_index++;
 	return sqlite3_column_int(statement, use_index);
+}
+
+float ofxSQLiteSelect::getFloat(int nIndex) {
+	if(last_result != SQLITE_ROW) {
+		return 0;
+	}
+	int use_index = nIndex;
+	if(use_index == -1)
+		use_index = col_index++;
+	return sqlite3_column_double(statement, use_index);
 }

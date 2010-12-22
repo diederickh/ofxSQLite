@@ -69,7 +69,7 @@ class ofxSQLiteSelect {
 		// fetching values.
 		std::string getString(int nIndex = -1);
 		int getInt(int nIndex = -1);
-
+		float getFloat(int nIndex = -1);
 	private:
 		std::vector<Join> joins;
 		ofxSQLiteWhere wheres;
