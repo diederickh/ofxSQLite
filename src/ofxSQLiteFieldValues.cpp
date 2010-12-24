@@ -23,11 +23,29 @@ void ofxSQLiteFieldValues::use(std::string sField, long nValue) {
 	field_values.push_back(field);
 }
 
+void ofxSQLiteFieldValues::use(std::string sField, unsigned long nValue) {
+	FieldValuePair field;
+	field.field			= sField;
+	field.type 			= OFX_SQLITE_TYPE_INT64;
+	field.value_int64	= nValue;
+	field.index 		= nextFieldIndex();
+	field_values.push_back(field);
+}
+
 void ofxSQLiteFieldValues::use(std::string sField, std::string sValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_TEXT;
 	field.value_string	= sValue;
+	field.index 		= nextFieldIndex();
+	field_values.push_back(field);
+}
+
+void ofxSQLiteFieldValues::use(std::string sField, uint64_t nValue) {
+	FieldValuePair field;
+	field.field			= sField;
+	field.type 			= OFX_SQLITE_TYPE_INT64;
+	field.value_string	= nValue;
 	field.index 		= nextFieldIndex();
 	field_values.push_back(field);
 }
@@ -67,7 +85,6 @@ void ofxSQLiteFieldValues::use(std::string sField) {
 	field.index 		= nextFieldIndex();
 	field_values.push_back(field);
 }
-
 
 
 void ofxSQLiteFieldValues::use(std::string sField, float nValue) {
