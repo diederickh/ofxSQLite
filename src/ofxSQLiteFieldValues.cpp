@@ -14,11 +14,20 @@ void ofxSQLiteFieldValues::use(std::string sField, int nValue) {
 	field_values.push_back(field);
 }
 
-void ofxSQLiteFieldValues::use(std::string sField, long nValue) {
+void ofxSQLiteFieldValues::use(std::string sField, uint64_t nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_INT64;
-	field.value_int64	= nValue;
+	field.value_uint64	= nValue;
+	field.index 		= nextFieldIndex();
+	field_values.push_back(field);
+}
+
+void ofxSQLiteFieldValues::use(std::string sField, long nValue) {
+	FieldValuePair field;
+	field.field			= sField;
+	field.type 			= OFX_SQLITE_TYPE_LONG;
+	field.value_long	= nValue;
 	field.index 		= nextFieldIndex();
 	field_values.push_back(field);
 }
@@ -34,11 +43,13 @@ void ofxSQLiteFieldValues::use(std::string sField, std::string sValue) {
 
 void ofxSQLiteFieldValues::use(std::string sField, ofxSQLiteType& oValue) {
 	switch(oValue.getType()) {
-		case OFX_SQLITE_TYPE_INT64: use(sField, oValue.getLong());break;
+		case OFX_SQLITE_TYPE_INT64: use(sField, oValue.getUint64()); break;
+		case OFX_SQLITE_TYPE_LONG: use(sField, oValue.getLong());break;
 		case OFX_SQLITE_TYPE_INT: use(sField, oValue.getInt()); break;
 		case OFX_SQLITE_TYPE_TEXT: use(sField,oValue.getString()); break;
 		default: break;
 	};
+	
 	/*
 	FieldValuePair field;
 	field.field			= sField;

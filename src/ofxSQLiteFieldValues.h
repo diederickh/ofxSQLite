@@ -16,7 +16,8 @@ struct FieldValuePair {
 	std::string value_string;
 	int value_int;
 	double value_double;
-	long value_int64;
+	long value_long;
+	uint64_t value_uint64;
 	int index;
 	int type;
 
@@ -24,9 +25,9 @@ struct FieldValuePair {
 		int result = SQLITE_OK;
 		switch(type) {
 			case OFX_SQLITE_TYPE_INT:		result = sqlite3_bind_int(pStatement, index, value_int);break;
-			case OFX_SQLITE_TYPE_INT64:		result = sqlite3_bind_int64(pStatement,index, value_int64); break;
+			case OFX_SQLITE_TYPE_LONG:		result = sqlite3_bind_int64(pStatement,index, value_long); break;
+			case OFX_SQLITE_TYPE_INT64:		result = sqlite3_bind_int64(pStatement,index, value_uint64); break;
 			case OFX_SQLITE_TYPE_TEXT: {
-				//std::cout << "TEXTL " << value_string << std::endl;
 				result = sqlite3_bind_text(pStatement, index, value_string.c_str(), value_string.size(), SQLITE_STATIC); break;
 			}
 			case OFX_SQLITE_TYPE_DOUBLE:	result = sqlite3_bind_double(pStatement, index, value_double);break;
@@ -51,6 +52,7 @@ class ofxSQLiteFieldValues {
 		void use(std::string sField, int nValue);
 		void use(std::string sField, float nValue);
 		void use(std::string sField, long nValue);
+		void use(std::string sField, uint64_t nValue);
 		void use(std::string sField, double nValue);
 		void use(std::string sField, std::string sValue);
 		void use(std::string sField, ofxSQLiteType& oValue);

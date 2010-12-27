@@ -11,6 +11,8 @@
 struct Where {
 	int field_index;
 	int type;
+	bool has_questionmark;
+	std::string div;
 };
 
 class ofxSQLiteWhere {
@@ -39,8 +41,29 @@ class ofxSQLiteWhere {
 
 		template<typename T>
 		ofxSQLiteWhere& where(std::string sField, T mValue, int nType) {
+			// It's also possible to use the where like:
+			// andWhere('fieldname > ?',value), by default we use "=" as
+			// comparator.
+			std::stringstream ss(sField);
+			std::string part;
+			std::string div = "";
+			std::string prev_part = "";
+			bool has_questionmark = false;
+			while(ss) {
+				ss >> part;
+				if(part == "<" || part == ">" || part == "<=" || part == ">=") {
+					div = part;
+					has_questionmark = true;
+					sField = prev_part;
+					break;
+				}
+				prev_part = part;
+			}
 			where_values.use(sField, mValue);
+			
 			struct Where where;
+			where.div = div;
+			where.has_questionmark = has_questionmark;
 			where.type = nType;
 			where.field_index = where_values.size() - 1;
 			wheres.push_back(where);
@@ -55,7 +78,8 @@ class ofxSQLiteWhere {
 			wheres.push_back(where);
  			return *this;
 		}
-
+		
+		
 		std::string getLiteralQuery() {
 			std::string where = "";
 			for (int i = 0; i < wheres.size(); ++i) {
@@ -69,8 +93,13 @@ class ofxSQLiteWhere {
 				}
 				if(pair.type == OFX_SQLITE_TYPE_NULL) 
 					where += where_type +pair.field +" is null ";
-				else
+				else if(cond.has_questionmark) {
+					where +=	where_type +pair.field +" " 
+								+cond.div +" ?"  +pair.indexString() +" ";
+				}
+				else {
 					where += where_type +pair.field +" = ?" +pair.indexString() +" ";
+				}
 			}
 			return where;
 		}

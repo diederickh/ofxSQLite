@@ -57,7 +57,7 @@ std::string ofxSQLiteSelect::getLiteralQuery() {
 
 	// wheres
 	std::string where = wheres.getLiteralQuery();
-
+	
 	// limit + offset
 	std::string limit = "";
 	if (limit_count != 0 && limit_offset == 0) {
