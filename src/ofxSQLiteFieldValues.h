@@ -54,7 +54,6 @@ class ofxSQLiteFieldValues {
 		void use(std::string sField, uint64_t nValue );
 		void use(std::string sField, float nValue);
 		void use(std::string sField, long nValue);
-		void use(std::string sField, uint64_t nValue);
 		void use(std::string sField, double nValue);
 		void use(std::string sField, std::string sValue);
 		void use(std::string sField, ofxSQLiteType& oValue);
