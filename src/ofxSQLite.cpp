@@ -5,7 +5,10 @@
 #include "ofxSQLiteSelect.h"
 
 ofxSQLite::ofxSQLite(std::string sDB):db_name(sDB) {
-	db_file = ofToDataPath(db_name);
+	// 007 breaks using ofToDataPath()
+	//db_file = ofToDataPath(db_name,true);
+	db_file  = sDB; 
+	cout << db_file << std::endl;
 	if (SQLITE_OK != sqlite3_open(db_file.c_str(), &db)) {
 		cout << sqlite3_errmsg(db);
 		exit(1);
