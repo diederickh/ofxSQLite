@@ -3,7 +3,19 @@
 	<version>0.01</version>
 	<author>Diederick Huijbers</author>
 	<description><![CDATA[Simple wrapper around sqlite.]]>
-	<url></url>
+	
+	<author_website>http://www.roxlu.com</author_website>
+	<code_url>https://github.com/roxlu/ofxSQLite</code_url>
+	<site_url>http://www.roxlu.com</site_url>
+	<download_url>https://github.com/roxlu/ofxSQLite/zipball/master</download_url>
+	<forum_url></forum_url>
+	<supported_os>
+		<win>y</win>
+    		<mac>y</mac>
+    		<linux>n</linux>
+    	</supported_os>
+    <has_example>y</has_example>
+	
 	<add>
 		<include>
 			
@@ -13,3 +25,6 @@
 		</include>
 	</add>
 </install>
+
+
+
