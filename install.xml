@@ -2,7 +2,7 @@
 	<name>ofxSQLite</name>
 	<version>0.01</version>
 	<author>Diederick Huijbers</author>
-	<description><![CDATA[Simple wrapper around sqlite.]]></description>
+	<description><![CDATA[Simple wrapper around the <a href="http://www.sqlite.org">sqlite database</a>.]]></description>
 	
 	<author_website>http://www.roxlu.com</author_website>
 	<code_url>https://github.com/roxlu/ofxSQLite</code_url>
