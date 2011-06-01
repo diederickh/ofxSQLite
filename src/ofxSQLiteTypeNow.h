@@ -3,6 +3,8 @@
 #include <ctime>
 #include <cstdlib>
 #include <iostream>
+#include "ofMain.h"
+#include "ofxSQLiteType.h"
 class ofxSQLiteTypeNow : public ofxSQLiteType {
 public:
 	virtual std::string getString() {

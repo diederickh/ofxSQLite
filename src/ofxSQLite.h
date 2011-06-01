@@ -15,7 +15,7 @@
 #include "lib/sqlite/sqlite3.h"
 #include "ofMain.h"
 
-
+#include "ofxSQLiteTypeNow.h"
 class ofxSQLiteInsert;
 class ofxSQLiteSelect;
 class ofxSQLiteUpdate;
@@ -32,6 +32,9 @@ class ofxSQLite {
 		const char* getError();
 
 		int simpleQuery(const char* pSQL);
+		inline ofxSQLiteTypeNow now() {
+			return ofxSQLiteTypeNow();
+		}
 
 	private:
 		sqlite3* db;

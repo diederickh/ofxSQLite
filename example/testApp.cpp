@@ -163,6 +163,33 @@ testApp::testApp(){
 	int count = sel.getInt();
 	cout << "total entries:" << count << std::endl;
 
+	// Example of using a timestamp (not tested in this code; purely as example)
+	// -------------------------------------------------------------------------
+	/*
+	// table with a couple of date fields
+	db = new ofxSQLite(ofToDataPath("tweets.db"));
+	int r = db->simpleQuery("CREATE TABLE IF NOT EXISTS tweets (" \
+						" id INTEGER PRIMARY KEY AUTOINCREMENT " \
+						",avatar VARCHAR(255) " \
+						",user_id VARCHAR(100) " \
+						",screen_name VARCHAR(50)" \
+						",tweet_id VARCHAR(50) " \
+						",date_created DATETIME DEFAULT CURRENT_TIMESTAMP "\
+						",date_exported DATETIME "\
+						",contains_face BOOLEAN " \
+						",is_used BOOLEAN " \
+						",is_fetched BOOLEAN " \
+						",is_exported BOOLEAN " \
+					");"
+	);
+	
+	// Updating the time field with a current timestamp:
+	// you can use "now()" to get a timestamp object
+	int r = db->update("tweets").use("is_exported",true).use("date_exported",db->now()).execute();
+	if(r != SQLITE_OK) {
+		ofLog(OF_LOG_ERROR, "error: cannot set export to true");
+	}
+	*/
 
 }
 
