@@ -23,7 +23,9 @@ class ofxSQLiteDelete;
 
 class ofxSQLite {
 	public:
+		ofxSQLite();
 		ofxSQLite(std::string sDB);
+		void setup(std::string sDB);
 		ofxSQLiteInsert insert(std::string sTable);
 		ofxSQLiteUpdate update(std::string sTable);
 		ofxSQLiteDelete	remove(std::string sTable);

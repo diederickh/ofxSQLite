@@ -127,6 +127,24 @@ testApp::testApp(){
 		cout << "ERROR CREATE TABLE\n";
 	}
 	
+	// just pasted this example here from a project I did.. (did no test it, 
+	// but shows you some things you can do with sqlite tables
+	// ------------------------------------------------------------------------
+	int r = sqlite->simpleQuery("CREATE TABLE IF NOT EXISTS tweets (" \
+						" id INTEGER PRIMARY KEY AUTOINCREMENT " \
+						",avatar VARCHAR(255) " \
+						",user_id VARCHAR(100) " \
+						",screen_name VARCHAR(50)" \
+						",tweet_id VARCHAR(50) " \
+						",date_created DATETIME DEFAULT CURRENT_TIMESTAMP "\
+						",date_exported DATETIME "\
+						",contains_face BOOLEAN " \
+						",is_used BOOLEAN " \
+						",is_fetched BOOLEAN " \
+						",is_exported BOOLEAN " \
+					");"
+	);
+	
 	// inserting mass amount of entries: use transations
 	// -------------------------------------------------------------------------
 	if (SQLITE_OK != sqlite->simpleQuery("BEGIN TRANSACTION;")) {

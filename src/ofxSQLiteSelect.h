@@ -3,9 +3,14 @@
 
 #include <vector>
 #include <string>
+#include <iomanip>
+#include <sstream>
 #include "lib/sqlite/sqlite3.h"
 #include "ofxSQLiteFieldValues.h"
 #include "ofxSQLiteWhere.h"
+
+
+using namespace std;
 
 struct Join {
 	std::string table;
@@ -70,6 +75,8 @@ class ofxSQLiteSelect {
 		std::string getString(int nIndex = -1);
 		int getInt(int nIndex = -1);
 		float getFloat(int nIndex = -1);
+		
+		std::string getResultAsAsciiTable();
 	private:
 		std::vector<Join> joins;
 		ofxSQLiteWhere wheres;

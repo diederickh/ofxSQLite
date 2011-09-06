@@ -163,3 +163,45 @@ float ofxSQLiteSelect::getFloat(int nIndex) {
 		use_index = col_index++;
 	return sqlite3_column_double(statement, use_index);
 }
+
+
+std::string ofxSQLiteSelect::getResultAsAsciiTable() {
+	std::string result;
+	
+	// get the biggest width per column and store the results.
+	int num_cols = sqlite3_column_count(statement);
+	vector<vector<string> > results;
+	vector<int> widths;
+	widths.assign(num_cols, 0);
+	while(sqlite3_step(statement) == SQLITE_ROW) {
+		vector<string> row_results;
+		
+		for(int i = 0; i < num_cols; ++i) {
+			const unsigned char* column_txt = sqlite3_column_text(statement, i);
+			int num_bytes = sqlite3_column_bytes(statement, i);
+			string s = "";
+			if(num_bytes != 0) {
+				s.append((const char*)column_txt, num_bytes);
+			}
+			//row_results.push_back((unsigned char*)column_txt);
+			row_results.push_back(s);
+			if(s.size() > widths[i]) {
+				widths[i] = s.size() + 2;
+			}
+		
+		}
+		
+		results.push_back(row_results);
+	}
+
+	stringstream ss;
+	for(int i = 0; i < results.size(); ++i) {
+		vector<string> row = results[i];
+		for(int c = 0; c < row.size(); ++c) {
+			int col_width = widths[c];
+			ss <<  setw(col_width)  << row[c] <<  "  │" ;
+		}
+		ss << endl;
+	}
+	return ss.str();
+}
