@@ -13,14 +13,28 @@
 #include <vector>
 #include <string>
 #include "lib/sqlite/sqlite3.h"
-#include "ofMain.h"
+//#include "ofMain.h"
 
 #include "ofxSQLiteTypeNow.h"
+
+//
+//#include "ofxSQLite.h"
+#include "ofxSQLiteAbstract.h"
+#include "ofxSQLiteInsert.h"
+#include "ofxSQLiteUpdate.h"
+#include "ofxSQLiteDelete.h"
+#include "ofxSQLiteSelect.h"
+#include "ofxSQLiteType.h"
+#include "ofxSQLiteTypeNow.h"
+//#include "ofxSQLiteSimpler.h"
+class ofxSQLiteSimpler;
+//
+/*
 class ofxSQLiteInsert;
 class ofxSQLiteSelect;
 class ofxSQLiteUpdate;
 class ofxSQLiteDelete;
-
+*/
 class ofxSQLite {
 	public:
 		ofxSQLite();
@@ -30,6 +44,9 @@ class ofxSQLite {
 		ofxSQLiteUpdate update(std::string sTable);
 		ofxSQLiteDelete	remove(std::string sTable);
 		ofxSQLiteSelect	select(std::string sFields);
+		
+		ofxSQLiteSimpler operator[](const std::string sKeyValue);
+		
 		int lastInsertID();
 		const char* getError();
 

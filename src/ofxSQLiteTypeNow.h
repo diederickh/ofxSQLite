@@ -3,7 +3,8 @@
 #include <ctime>
 #include <cstdlib>
 #include <iostream>
-#include "ofMain.h"
+#include <sstream>
+
 #include "ofxSQLiteType.h"
 class ofxSQLiteTypeNow : public ofxSQLiteType {
 public:
@@ -19,3 +20,5 @@ public:
 	}
 };
 #endif
+
+ 

@@ -3,7 +3,7 @@
 #include "ofxSQLiteUpdate.h"
 #include "ofxSQLiteDelete.h"
 #include "ofxSQLiteSelect.h"
-
+#include "ofxSQLiteSimpler.h"
 ofxSQLite::ofxSQLite()
 :db_name("")
 {
@@ -60,3 +60,10 @@ const char* ofxSQLite::getError() {
 int ofxSQLite::lastInsertID() {
 	return sqlite3_last_insert_rowid(db);
 }
+
+ofxSQLiteSimpler ofxSQLite::operator[](const std::string sKeyValue)  {
+	ofxSQLiteSimpler simple(*this, sKeyValue);
+	simple.setDB(*this);
+	return simple;
+}
+
