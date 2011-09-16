@@ -19,7 +19,7 @@ class ofxSQLiteDelete {
  			return *this;
 		}
 
-		std::string getLiteralQuery();
+		std::string getLiteralQuery(bool bFillValues = false);
 		int execute();
 
 		// where clause..

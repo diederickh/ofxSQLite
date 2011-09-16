@@ -3,7 +3,8 @@
 #include "ofxSQLiteUpdate.h"
 #include "ofxSQLiteDelete.h"
 #include "ofxSQLiteSelect.h"
-#include "ofxSQLiteSimpler.h"
+//#include "ofxSQLiteSimpler.h"
+
 ofxSQLite::ofxSQLite()
 :db_name("")
 {
@@ -63,7 +64,9 @@ int ofxSQLite::lastInsertID() {
 
 ofxSQLiteSimpler ofxSQLite::operator[](const std::string sKeyValue)  {
 	ofxSQLiteSimpler simple(*this, sKeyValue);
-	simple.setDB(*this);
 	return simple;
 }
 
+void ofxSQLite::printTable(std::string sTable) {
+	cout << select("*").from(sTable).execute().getResultAsAsciiTable();
+}

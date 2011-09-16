@@ -80,7 +80,7 @@ class ofxSQLiteWhere {
 		}
 		
 		
-		std::string getLiteralQuery() {
+		std::string getLiteralQuery(bool bFillValues = false) {
 			std::string where = "";
 			for (int i = 0; i < wheres.size(); ++i) {
 				FieldValuePair pair = where_values.at(i);
@@ -91,14 +91,28 @@ class ofxSQLiteWhere {
 					case WHERE_OR: where_type = " OR "; break;
 					case WHERE_AND: where_type = " AND "; break;
 				}
-				if(pair.type == OFX_SQLITE_TYPE_NULL) 
+				if(pair.type == OFX_SQLITE_TYPE_NULL)  {
 					where += where_type +pair.field +" is null ";
+				}
 				else if(cond.has_questionmark) {
 					where +=	where_type +pair.field +" " 
-								+cond.div +" ?"  +pair.indexString() +" ";
+								+cond.div;
+					if(!bFillValues) {
+						where += " ?"  +pair.indexString() +" ";
+					} 
+					else {
+						where += " \"" +pair.valueString() +"\" ";
+					}
 				}
+				
 				else {
-					where += where_type +pair.field +" = ?" +pair.indexString() +" ";
+					where += where_type +pair.field +" = ";
+					if(!bFillValues) {
+						where +="?" +pair.indexString() +" ";
+					}
+					else {
+						where +=" \"" +pair.valueString() +"\" ";
+					}
 				}
 			}
 			return where;

@@ -24,13 +24,32 @@ struct FieldValuePair {
 	void bind(sqlite3_stmt* pStatement) {
 		int result = SQLITE_OK;
 		switch(type) {
-			case OFX_SQLITE_TYPE_INT:		result = sqlite3_bind_int(pStatement, index, value_int);break;
-			case OFX_SQLITE_TYPE_LONG:		result = sqlite3_bind_int64(pStatement,index, value_long); break;
-			case OFX_SQLITE_TYPE_INT64:		result = sqlite3_bind_int64(pStatement,index, value_uint64); break;
-			case OFX_SQLITE_TYPE_TEXT: {
-				result = sqlite3_bind_text(pStatement, index, value_string.c_str(), value_string.size(), SQLITE_STATIC); break;
+			case OFX_SQLITE_TYPE_INT:	{
+				result = sqlite3_bind_int(pStatement, index, value_int);
+				break;
 			}
-			case OFX_SQLITE_TYPE_DOUBLE:	result = sqlite3_bind_double(pStatement, index, value_double);break;
+			case OFX_SQLITE_TYPE_LONG: {
+				result = sqlite3_bind_int64(pStatement,index, value_long); 
+				break;
+			}
+			case OFX_SQLITE_TYPE_INT64: {	
+				result = sqlite3_bind_int64(pStatement,index, value_uint64); 
+				break;
+			}
+			case OFX_SQLITE_TYPE_TEXT: {
+				result = sqlite3_bind_text(
+						 	pStatement
+						 	,index
+						 	,value_string.c_str()
+						 	,value_string.size()
+						 	,SQLITE_STATIC
+				); 
+				break;
+			}
+			case OFX_SQLITE_TYPE_DOUBLE: {	
+				result = sqlite3_bind_double(pStatement, index, value_double);
+				break;
+			}
 			default:break;
 		}
 
@@ -43,6 +62,35 @@ struct FieldValuePair {
 		std::stringstream ss;
 		ss << index;
 		return ss.str();
+	}
+	
+	std::string valueString() {
+		std::string result = "";
+		switch(type) {
+			case OFX_SQLITE_TYPE_INT: {
+				std::stringstream ss;					
+				ss << value_int;
+				result = ss.str();
+				break;
+			}
+			case OFX_SQLITE_TYPE_LONG: {
+				std::stringstream ss;					
+				ss << value_long;
+				result = ss.str();
+				break;
+			}
+			case OFX_SQLITE_TYPE_INT64: {
+				std::stringstream ss;					
+				ss << value_uint64;
+				result = ss.str();
+				break;
+			}
+			case OFX_SQLITE_TYPE_TEXT: {
+				result = value_string;
+				break;
+			}
+		}
+		return result;
 	}
 };
 

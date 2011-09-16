@@ -6,6 +6,3 @@ ofxSQLiteSimpler::ofxSQLiteSimpler(ofxSQLite& rDB, string sTable)
 {
 }
 
-void ofxSQLiteSimpler::setDB(ofxSQLite& rDB) {
-	db = rDB;
-}

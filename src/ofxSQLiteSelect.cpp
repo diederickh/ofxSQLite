@@ -47,7 +47,7 @@ ofxSQLiteSelect& ofxSQLiteSelect::limit(int nCount, int nOffset) {
 	return *this;
 }
 
-std::string ofxSQLiteSelect::getLiteralQuery() {
+std::string ofxSQLiteSelect::getLiteralQuery(bool bFillValues) {
 	// inner joins.
 	std::string inner_joins = "";
 	for (int i = 0; i < joins.size(); ++i) {
@@ -56,7 +56,7 @@ std::string ofxSQLiteSelect::getLiteralQuery() {
 	}
 
 	// wheres
-	std::string where = wheres.getLiteralQuery();
+	std::string where = wheres.getLiteralQuery(bFillValues);
 	
 	// limit + offset
 	std::string limit = "";
@@ -97,7 +97,7 @@ ofxSQLiteSelect& ofxSQLiteSelect::execute() {
 	std::string sql = getLiteralQuery();
 	if (SQLITE_OK != sqlite3_prepare_v2(sqlite, sql.c_str(),-1, &statement, 0)) {
 		sqlite3_finalize(statement);
-		std::cout << sqlite3_errmsg(sqlite);
+		std::cout << sqlite3_errmsg(sqlite) << endl;
 		return *this;
 	}
 	wheres.bind(statement);
@@ -164,6 +164,14 @@ float ofxSQLiteSelect::getFloat(int nIndex) {
 	return sqlite3_column_double(statement, use_index);
 }
 
+int ofxSQLiteSelect::getNumColumns() {
+	return sqlite3_column_count(statement);
+}
+
+string ofxSQLiteSelect::getColumnName(int nColumnNum) {
+	const char* column_txt = sqlite3_column_name(statement, nColumnNum);
+	return column_txt;
+}
 
 std::string ofxSQLiteSelect::getResultAsAsciiTable() {
 	std::string result;
@@ -177,6 +185,7 @@ std::string ofxSQLiteSelect::getResultAsAsciiTable() {
 		vector<string> row_results;
 		
 		for(int i = 0; i < num_cols; ++i) {
+			// @todo do we have a memory leak here?
 			const unsigned char* column_txt = sqlite3_column_text(statement, i);
 			int num_bytes = sqlite3_column_bytes(statement, i);
 			string s = "";
@@ -188,9 +197,7 @@ std::string ofxSQLiteSelect::getResultAsAsciiTable() {
 			if(s.size() > widths[i]) {
 				widths[i] = s.size() + 2;
 			}
-		
 		}
-		
 		results.push_back(row_results);
 	}
 
@@ -199,7 +206,7 @@ std::string ofxSQLiteSelect::getResultAsAsciiTable() {
 		vector<string> row = results[i];
 		for(int c = 0; c < row.size(); ++c) {
 			int col_width = widths[c];
-			ss <<  setw(col_width)  << row[c] <<  "  │" ;
+			ss <<  setw(col_width)  << row[c] <<  "  |" ;
 		}
 		ss << endl;
 	}

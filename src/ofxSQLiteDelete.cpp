@@ -5,10 +5,10 @@
 ofxSQLiteDelete::ofxSQLiteDelete(sqlite3* pSQLite, std::string sTable):sqlite(pSQLite), table(sTable) {
 }
 
-std::string ofxSQLiteDelete::getLiteralQuery() {
+std::string ofxSQLiteDelete::getLiteralQuery(bool bFillValues) {
 	std::string sql = "DELETE FROM " +table +" ";
 	if(wheres.size() > 0) {
-		sql += wheres.getLiteralQuery();
+		sql += wheres.getLiteralQuery(bFillValues);
 	}
 	return sql;
 }

@@ -42,8 +42,9 @@ class ofxSQLite {
 		void setup(std::string sDB);
 		ofxSQLiteInsert insert(std::string sTable);
 		ofxSQLiteUpdate update(std::string sTable);
-		ofxSQLiteDelete	remove(std::string sTable);
-		ofxSQLiteSelect	select(std::string sFields);
+		ofxSQLiteDelete remove(std::string sTable);
+		ofxSQLiteSelect select(std::string sFields);
+		void printTable(std::string sTable);
 		
 		ofxSQLiteSimpler operator[](const std::string sKeyValue);
 		
@@ -54,11 +55,56 @@ class ofxSQLite {
 		inline ofxSQLiteTypeNow now() {
 			return ofxSQLiteTypeNow();
 		}
+		
+		inline sqlite3* getSQLitePtr();		
 
 	private:
 		sqlite3* db;
 		std::string db_name;
 		std::string db_file;
 };
+
+inline sqlite3* ofxSQLite::getSQLitePtr() {
+	return db;
+}
+
+class ofxSQLiteSimpler {
+public:
+	ofxSQLiteSimpler(ofxSQLite& rDB, string sTable)
+	:db(rDB)
+	,table(sTable)
+	{
+	}
+	
+	template<typename T>
+	ofxSQLiteSelect find(string sWhereField, T mWhereValue, string sSelectFields = "*") {
+		ofxSQLiteSelect sel = db.select(sSelectFields).from(table).where(sWhereField, mWhereValue).execute();
+		return sel;
+	}
+	
+	// example: db["pakbox_users"].findOne("pu_id", 68, "pu_name").getString(0);
+	template<typename T>
+	ofxSQLiteSelect findOne(string sWhereField, T mWhereValue, string sSelectFields = "*") {
+		ofxSQLiteSelect sel = db
+			.select(sSelectFields)
+			.from(table)
+			.where(sWhereField, mWhereValue)
+			.limit(1)
+			.execute()
+			.begin();
+		
+		return sel;
+	}
+	
+	void print(){
+		cout << db.select("*").from(table).execute().getResultAsAsciiTable();
+	}
+	
+private:
+	ofxSQLite& db;
+	string table;
+
+};
+
 #endif
 

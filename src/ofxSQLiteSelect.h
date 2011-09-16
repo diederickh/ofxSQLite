@@ -50,6 +50,7 @@ class ofxSQLiteSelect {
 			wheres.where(sField, mValue, nType);
 			return *this;
 		}
+		
 		ofxSQLiteSelect& whereNull(std::string sField) {
 			wheres.whereNull(sField);
 			return *this;
@@ -63,7 +64,7 @@ class ofxSQLiteSelect {
 
 		// execution
 		ofxSQLiteSelect& execute();
-		std::string getLiteralQuery();
+		std::string getLiteralQuery(bool bFillValues = false);
 		bool hasRow();
 
 		// iterating
@@ -72,6 +73,8 @@ class ofxSQLiteSelect {
 		bool hasNext();
 
 		// fetching values.
+		int getNumColumns();
+		string getColumnName(int nColumNum);
 		std::string getString(int nIndex = -1);
 		int getInt(int nIndex = -1);
 		float getFloat(int nIndex = -1);
