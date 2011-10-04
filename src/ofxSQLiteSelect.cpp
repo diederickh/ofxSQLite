@@ -44,7 +44,7 @@ ofxSQLiteSelect& ofxSQLiteSelect::limit(int nCount) {
 ofxSQLiteSelect& ofxSQLiteSelect::limit(int nCount, int nOffset) {
 	limit_count = nCount;
 	limit_offset = nOffset;
-	return *this;
+	return *this; 
 }
 
 std::string ofxSQLiteSelect::getLiteralQuery(bool bFillValues) {
@@ -89,7 +89,7 @@ std::string ofxSQLiteSelect::getLiteralQuery(bool bFillValues) {
 						+order_by
 						+limit;
 
-	//std::cout << sql << std::endl;
+	std::cout << sql << std::endl;
 	return sql;
 }
 

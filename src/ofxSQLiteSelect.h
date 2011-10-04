@@ -35,16 +35,24 @@ class ofxSQLiteSelect {
 		// where clause..
 		template<typename T>
 		ofxSQLiteSelect& where(std::string sField, T mValue) {
-			return where(sField, mValue, wheres.WHERE);
+			return where(sField, mValue, WHERE);
 		}
+		
 		template<typename T>
 		ofxSQLiteSelect& orWhere(std::string sField, T mValue) {
-			return where(sField, mValue, wheres.WHERE_OR);
+			return where(sField, mValue, WHERE_OR);
 		}
+		
+		template<typename T>
+		ofxSQLiteSelect& orLike(std::string sField, T mValue) {
+			return where(sField, mValue, WHERE_OR_LIKE);
+		}
+				
 		template<typename T>
 		ofxSQLiteSelect& andWhere(std::string sField, T mValue) {
-			return where(sField, mValue, wheres.WHERE_AND);
+			return where(sField, mValue, WHERE_AND);
 		}
+		
 		template<typename T>
 		ofxSQLiteSelect& where(std::string sField, T mValue, int nType) {
 			wheres.where(sField, mValue, nType);

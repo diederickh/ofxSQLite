@@ -25,15 +25,15 @@ class ofxSQLiteUpdate {
 		// where clause..
 		template<typename T>
 		ofxSQLiteUpdate& where(std::string sField, T mValue) {
-			return where(sField, mValue, wheres.WHERE);
+			return where(sField, mValue, WHERE);
 		}
 		template<typename T>
 		ofxSQLiteUpdate& orWhere(std::string sField, T mValue) {
-			return where(sField, mValue, wheres.WHERE_OR);
+			return where(sField, mValue, WHERE_OR);
 		}
 		template<typename T>
 		ofxSQLiteUpdate& andWhere(std::string sField, T mValue) {
-			return where(sField, mValue, wheres.WHERE_AND);
+			return where(sField, mValue, WHERE_AND);
 		}
 		template<typename T>
 		ofxSQLiteUpdate& where(std::string sField, T mValue, int nType) {

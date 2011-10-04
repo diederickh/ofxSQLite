@@ -10,6 +10,14 @@
 #include <iostream>
 #include <stdio.h>
 
+enum OperatorType {
+	 OP_GREATER_THAN
+	,OP_GREATER_EQUAL_THAN
+	,OP_LESS_THAN
+	,OP_LESS_EQUAL_THAN
+	,OP_LIKE
+	,OP_EQUAL
+};
 
 struct FieldValuePair {
 	std::string field;
@@ -20,7 +28,8 @@ struct FieldValuePair {
 	uint64_t value_uint64;
 	int index;
 	int type;
-
+	int sql_operator;
+	
 	void bind(sqlite3_stmt* pStatement) {
 		int result = SQLITE_OK;
 		switch(type) {
@@ -56,6 +65,56 @@ struct FieldValuePair {
 		if(result != SQLITE_OK) {
 			printf("SQLITE: Error while binding parameter: %d\n", index);
 		}
+	}
+	
+	void setOperatorType(int op) {
+		sql_operator = op;
+	}
+			  
+	std::string getFieldAndValueForQuery(bool embedValue = false) {
+		std::string result = "";
+		std::string value_part = "";
+		
+		// create value part.
+		if(embedValue) {
+			value_part = "\"" +valueString() +"\"";
+		}
+		else {
+			value_part = " ?" +indexString() +" ";
+		}
+		
+		// create field + value part.
+		switch(sql_operator) {
+			case OP_GREATER_THAN: {
+				result = field +" > " +value_part;
+				break;
+			}
+			case OP_GREATER_EQUAL_THAN: {
+				result = field +" >= "  +value_part;
+				break;
+			}
+			case OP_LESS_THAN: {
+				result = field +" < " +value_part;
+				break;
+			}
+			case OP_LESS_EQUAL_THAN: {
+				result = field +" <= " +value_part;
+				break;
+			}
+			case OP_EQUAL:{
+				result = field +" = " +value_part;	
+				break;	
+			}
+			case OP_LIKE: {
+				result = field + " LIKE " +value_part;
+				break;
+			}
+			default:{
+				printf("Unhandled operator type %d for field: %s.\n", sql_operator, field.c_str());
+				break;
+			}
+		}
+		return result;
 	}
 
 	std::string indexString() {
@@ -97,18 +156,18 @@ struct FieldValuePair {
 class ofxSQLiteFieldValues {
 	public:
 		ofxSQLiteFieldValues();
-		void use(std::string sField, int nValue);
-		void use(std::string sField, unsigned long nValue);
-		void use(std::string sField, uint64_t nValue );
-		void use(std::string sField, float nValue);
-		void use(std::string sField, long nValue);
-		void use(std::string sField, double nValue);
-		void use(std::string sField, std::string sValue);
-		void use(std::string sField, ofxSQLiteType& oValue);
-		void use(std::string sField);
+		int use(std::string sField, int nValue);
+		int use(std::string sField, unsigned long nValue);
+		int use(std::string sField, uint64_t nValue );
+		int use(std::string sField, float nValue);
+		int use(std::string sField, long nValue);
+		int use(std::string sField, double nValue);
+		int use(std::string sField, std::string sValue);
+		int use(std::string sField, ofxSQLiteType& oValue);
+		int use(std::string sField);
 		void bind(sqlite3_stmt* pStatement);
 
-		FieldValuePair at(int nIndex);
+		FieldValuePair& at(int nIndex);
 		void begin();
 		FieldValuePair current();
 		void next();

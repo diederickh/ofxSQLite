@@ -7,22 +7,48 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
+using namespace std; // tmp
+
+
+enum WhereTypes {
+		 WHERE
+		,WHERE_AND
+		,WHERE_OR
+		,WHERE_LIKE
+		,WHERE_OR_LIKE
+		,WHERE_AND_LIKE
+};
 
 struct Where {
 	int field_index;
 	int type;
-	bool has_questionmark;
-	std::string div;
+	
+	std::string getAndOr(bool isFirstWhereClause = false) {
+		std::string result;
+		if(!isFirstWhereClause) {
+			if(type == WHERE_AND) {
+				result += " AND ";
+			}
+			else if(type == WHERE_OR) {
+				result += " OR ";
+			}
+			else if(type == WHERE_OR_LIKE) {
+				result += " OR  ";
+			}
+			else if(type == WHERE_AND_LIKE) {
+				result += " AND  ";
+			}
+		}
+		else {
+			return " WHERE "; 
+		}
+		return result;
+	}
 };
 
 class ofxSQLiteWhere {
 	public:
-		enum {
-			 WHERE
-			,WHERE_AND
-			,WHERE_OR
-		};
-
+		
 		// where clause..
 		template<typename T>
 		ofxSQLiteWhere& where(std::string sField, T mValue) {
@@ -46,24 +72,44 @@ class ofxSQLiteWhere {
 			// comparator.
 			std::stringstream ss(sField);
 			std::string part;
-			std::string div = "";
 			std::string prev_part = "";
-			bool has_questionmark = false;
+			int sql_operator = 0;
 			while(ss) {
 				ss >> part;
-				if(part == "<" || part == ">" || part == "<=" || part == ">=") {
-					div = part;
-					has_questionmark = true;
+				if(part == "<") {
+					sql_operator = OP_LESS_THAN; 
+				}
+				else if(part == ">") {
+					sql_operator = OP_GREATER_THAN;
+				}
+				else if(part == "<=") {
+					sql_operator = OP_LESS_EQUAL_THAN;
+				}
+				else if(part == ">=") {
+					sql_operator = OP_GREATER_EQUAL_THAN;
+				}
+				
+				if(sql_operator != 0) {
+					//div = part;
+					//has_questionmark = true;
 					sField = prev_part;
 					break;
 				}
 				prev_part = part;
 			}
-			where_values.use(sField, mValue);
+			
+			// when no other operator found we use the default one...
+			if(sql_operator == 0) {
+				sql_operator = OP_EQUAL;
+			}
+			if(nType == WHERE_LIKE || nType == WHERE_OR_LIKE || nType == WHERE_AND_LIKE) {
+				sql_operator = OP_LIKE;
+			}
+			
+			int field_value_index = where_values.use(sField, mValue);
+			where_values.at(field_value_index).setOperatorType(sql_operator);
 			
 			struct Where where;
-			where.div = div;
-			where.has_questionmark = has_questionmark;
 			where.type = nType;
 			where.field_index = where_values.size() - 1;
 			wheres.push_back(where);
@@ -78,44 +124,26 @@ class ofxSQLiteWhere {
 			wheres.push_back(where);
  			return *this;
 		}
-		
-		
-		std::string getLiteralQuery(bool bFillValues = false) {
-			std::string where = "";
-			for (int i = 0; i < wheres.size(); ++i) {
-				FieldValuePair pair = where_values.at(i);
-				struct Where cond = wheres[i];
-				std::string where_type = "";
-				switch(cond.type) {
-					case WHERE: where_type = " WHERE "; break;
-					case WHERE_OR: where_type = " OR "; break;
-					case WHERE_AND: where_type = " AND "; break;
-				}
-				if(pair.type == OFX_SQLITE_TYPE_NULL)  {
-					where += where_type +pair.field +" is null ";
-				}
-				else if(cond.has_questionmark) {
-					where +=	where_type +pair.field +" " 
-								+cond.div;
-					if(!bFillValues) {
-						where += " ?"  +pair.indexString() +" ";
-					} 
-					else {
-						where += " \"" +pair.valueString() +"\" ";
-					}
-				}
 				
-				else {
-					where += where_type +pair.field +" = ";
-					if(!bFillValues) {
-						where +="?" +pair.indexString() +" ";
-					}
-					else {
-						where +=" \"" +pair.valueString() +"\" ";
-					}
+		std::string getLiteralQuery(bool bFillValues = false) {
+			std::string result = "";
+			std::vector<Where>::iterator it = wheres.begin();
+			int counter = 0;
+			while(it != wheres.end()) {
+				Where& where = *it;
+				FieldValuePair value_pair = where_values.at(counter);
+				
+				if(value_pair.type == OFX_SQLITE_TYPE_NULL) {
+					result += where.getAndOr(counter == 0) +value_pair.field +" is null ";
 				}
+				else {
+					result += where.getAndOr(counter == 0);
+					result += value_pair.getFieldAndValueForQuery();
+				}
+				++counter;
+				++it;
 			}
-			return where;
+			return result;
 		}
 
 		void bind(sqlite3_stmt* pStatement) {
