@@ -89,7 +89,7 @@ std::string ofxSQLiteSelect::getLiteralQuery(bool bFillValues) {
 						+order_by
 						+limit;
 
-	std::cout << sql << std::endl;
+	//std::cout << sql << std::endl;
 	return sql;
 }
 
