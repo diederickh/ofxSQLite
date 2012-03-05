@@ -1,6 +1,7 @@
 #ifndef OFXSQLITETYPEH
 #define OFXSQLITETYPEH
 #include <string>
+#include <stdint.h>
 
 enum {
  	 OFX_SQLITE_TYPE_INT
@@ -14,7 +15,7 @@ enum {
 class ofxSQLiteType {
 public:
 	virtual std::string getString()		{	return	"";		}
-	virtual int getInt()				{ 	return	0;		}	
+	virtual int getInt()				{ 	return	0;		}
 	virtual long getLong()				{ 	return	0;		}
 	virtual uint64_t getUint64()		{	return  0;		}
 	virtual int getType() = 0;
