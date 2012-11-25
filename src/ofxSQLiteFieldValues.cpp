@@ -35,7 +35,7 @@ int ofxSQLiteFieldValues::use(std::string sField, long nValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(std::string sField, unsigned long nValue) {
+int ofxSQLiteFieldValues::use(std::string sField, unsigned long long nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_INT64;
