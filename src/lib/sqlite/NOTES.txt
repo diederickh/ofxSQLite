@@ -1,0 +1,1 @@
+I had to use the latest version of SQLite in order to have proper access to firefox history -- Check Virus libs for version details

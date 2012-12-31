@@ -157,7 +157,7 @@ class ofxSQLiteFieldValues {
 	public:
 		ofxSQLiteFieldValues();
 		int use(std::string sField, int nValue);
-		int use(std::string sField, unsigned long nValue);
+		int use(std::string sField, unsigned long long  nValue);
 		int use(std::string sField, uint64_t nValue );
 		int use(std::string sField, float nValue);
 		int use(std::string sField, long nValue);
