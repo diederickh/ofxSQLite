@@ -19,15 +19,16 @@ ofxSQLite::ofxSQLite(std::string sDB):db_name(sDB) {
 	setup(sDB);
 }
 
-void ofxSQLite::setup(std::string sDB) {
+bool ofxSQLite::setup(std::string sDB) {
 	db_name = sDB;
 	db_file  = sDB; 
 	if (SQLITE_OK != sqlite3_open(db_file.c_str(), &db)) {
-		exit(1);
         ofLogError("ofxSQLite") << sqlite3_errmsg(db);
+        return false;
 	}
     
     ofLogNotice("ofxSQLite") << "Opened:" << db_file << endl;
+    return true;
 }
 
 int ofxSQLite::simpleQuery(const char* pSQL) {
