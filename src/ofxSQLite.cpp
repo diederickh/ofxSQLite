@@ -5,6 +5,8 @@
 #include "ofxSQLiteSelect.h"
 //#include "ofxSQLiteSimpler.h"
 
+#include "ofLog.h"
+
 ofxSQLite::ofxSQLite()
 :db_name("")
 {
@@ -21,10 +23,11 @@ void ofxSQLite::setup(std::string sDB) {
 	db_name = sDB;
 	db_file  = sDB; 
 	if (SQLITE_OK != sqlite3_open(db_file.c_str(), &db)) {
-		cout << sqlite3_errmsg(db);
 		exit(1);
+        ofLogError("ofxSQLite") << sqlite3_errmsg(db);
 	}
-	cout << "opened:" << db_file << endl;
+    
+    ofLogNotice("ofxSQLite") << "Opened:" << db_file << endl;
 }
 
 int ofxSQLite::simpleQuery(const char* pSQL) {
@@ -40,6 +43,7 @@ ofxSQLiteInsert ofxSQLite::insert(std::string sTable) {
 	ofxSQLiteInsert insert = ofxSQLiteInsert(db, sTable);
 	return insert;
 }
+
 ofxSQLiteUpdate ofxSQLite::update(std::string sTable) {
 	return ofxSQLiteUpdate(db, sTable);
 }
