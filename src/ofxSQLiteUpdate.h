@@ -1,10 +1,11 @@
-#ifndef OFXSQLITEUPDATEH
-#define OFXSQLITEUPDATEH
+#pragma once
+
 
 #include <vector>
 #include <string>
 #include "ofxSQLiteWhere.h"
 #include "ofxSQLiteFieldValues.h"
+
 
 class ofxSQLiteFieldValues;
 class sqlite3;
@@ -47,4 +48,3 @@ class ofxSQLiteUpdate {
 		ofxSQLiteFieldValues field_values;
 		sqlite3* sqlite;
 };
-#endif

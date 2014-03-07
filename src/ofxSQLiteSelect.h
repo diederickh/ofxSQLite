@@ -5,7 +5,7 @@
 #include <string>
 #include <iomanip>
 #include <sstream>
-#include "lib/sqlite/sqlite3.h"
+#include "sqlite/sqlite3.h"
 #include "ofxSQLiteFieldValues.h"
 #include "ofxSQLiteWhere.h"
 

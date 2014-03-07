@@ -1,11 +1,15 @@
 #include "ofxSQLite.h"
-#include "ofxSQLiteAbstract.h"
 #include "ofxSQLiteInsert.h"
 #include "ofxSQLiteFieldValues.h"
-#include "lib/sqlite/sqlite3.h"
+#include "sqlite/sqlite3.h"
 
 
-ofxSQLiteInsert::ofxSQLiteInsert(sqlite3* pSQLite, std::string sTable):sqlite(pSQLite),table(sTable),pair_count(0) {
+ofxSQLiteInsert::ofxSQLiteInsert(sqlite3* pSQLite,
+                                 std::string sTable):
+    sqlite(pSQLite),
+    table(sTable),
+    pair_count(0)
+{
 }
 
 ofxSQLiteFieldValues ofxSQLiteInsert::getFields() {
@@ -15,7 +19,9 @@ ofxSQLiteFieldValues ofxSQLiteInsert::getFields() {
 std::string ofxSQLiteInsert::getLiteralQuery() {
 	std::string sql = "INSERT INTO " +table +" (";
 	std::string values = ") VALUES (";
-	field_values.begin();
+
+    field_values.begin();
+
 	while(field_values.hasNext()) {
 		FieldValuePair field = field_values.current();
 		field_values.next();
@@ -38,7 +44,7 @@ int ofxSQLiteInsert::execute() {
 	field_values.bind(statement);
 
 	// execute the query.
-	if (sqlite3_step(statement) != SQLITE_DONE) {
+	if (SQLITE_DONE != sqlite3_step(statement)) {
 		sqlite3_finalize(statement);
 		return sqlite3_errcode(sqlite);
 	}

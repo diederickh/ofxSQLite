@@ -1,72 +1,70 @@
 #include "ofxSQLite.h"
-#include "ofxSQLiteInsert.h"
-#include "ofxSQLiteUpdate.h"
-#include "ofxSQLiteDelete.h"
-#include "ofxSQLiteSelect.h"
-//#include "ofxSQLiteSimpler.h"
 
-ofxSQLite::ofxSQLite()
-:db_name("")
+
+ofxSQLite::ofxSQLite():
+    db(0),
+    db_file("")
 {
 }
 
-// @deprecated, use setup()
-ofxSQLite::ofxSQLite(std::string sDB):db_name(sDB) {
-	// 007 breaks using ofToDataPath()
-	//db_file = ofToDataPath(db_name,true);
-	setup(sDB);
-}
 
-void ofxSQLite::setup(std::string sDB) {
-	db_name = sDB;
-	db_file  = sDB; 
-	if (SQLITE_OK != sqlite3_open(db_file.c_str(), &db)) {
-		cout << sqlite3_errmsg(db);
-		exit(1);
+void ofxSQLite::setup(const std::string& sDB)
+{
+	db_file = ofToDataPath(sDB, true);
+
+	if (SQLITE_OK != sqlite3_open(db_file.c_str(), &db))
+    {
+        ofLogError("ofxSQLite::setup") << sqlite3_errmsg(db);
+        db = 0;
 	}
-	cout << "opened:" << db_file << endl;
+
+    ofLogVerbose("ofxSQLite::setup") << "opened:" << db_file << endl;
 }
 
-int ofxSQLite::simpleQuery(const char* pSQL) {
+int ofxSQLite::simpleQuery(const std::string& SQL) {
 	sqlite3_stmt* statement;
-	if (SQLITE_OK != sqlite3_prepare_v2(db, pSQL,-1, &statement, 0)) {
+
+	if (SQLITE_OK != sqlite3_prepare_v2(db, SQL.c_str(), -1, &statement, 0)) {
 		return sqlite3_errcode(db);
 	}
-	while(SQLITE_ROW == sqlite3_step(statement));
+
+    while(SQLITE_ROW == sqlite3_step(statement)); // ?
+
 	return sqlite3_finalize(statement);
 }
 
-ofxSQLiteInsert ofxSQLite::insert(std::string sTable) {
-	ofxSQLiteInsert insert = ofxSQLiteInsert(db, sTable);
-	return insert;
+ofxSQLiteInsert ofxSQLite::insert(const std::string& sTable) {
+	return ofxSQLiteInsert(db, sTable);
 }
-ofxSQLiteUpdate ofxSQLite::update(std::string sTable) {
+
+ofxSQLiteUpdate ofxSQLite::update(const std::string& sTable) {
 	return ofxSQLiteUpdate(db, sTable);
 }
 
-ofxSQLiteDelete ofxSQLite::remove(std::string sTable) {
+ofxSQLiteDelete ofxSQLite::remove(const std::string& sTable) {
 	return ofxSQLiteDelete(db, sTable);
 }
 
-ofxSQLiteSelect	ofxSQLite::select(std::string sFields) {
+ofxSQLiteSelect	ofxSQLite::select(const std::string& sFields) {
 	ofxSQLiteSelect select = ofxSQLiteSelect(db);
 	select.select(sFields);
 	return select;
 }
 
-const char* ofxSQLite::getError() {
-	return sqlite3_errmsg(db);
+std::string ofxSQLite::getError() {
+    const char* err = sqlite3_errmsg(db);
+    return err ? err : "Unknown Error";
 }
 
 int ofxSQLite::lastInsertID() {
 	return sqlite3_last_insert_rowid(db);
 }
 
-ofxSQLiteSimpler ofxSQLite::operator[](const std::string sKeyValue)  {
+ofxSQLiteSimpler ofxSQLite::operator[](const std::string& sKeyValue) {
 	ofxSQLiteSimpler simple(*this, sKeyValue);
 	return simple;
 }
 
-void ofxSQLite::printTable(std::string sTable) {
+void ofxSQLite::printTable(const std::string& sTable) {
 	cout << select("*").from(sTable).execute().getResultAsAsciiTable();
 }

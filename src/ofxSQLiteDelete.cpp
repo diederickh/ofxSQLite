@@ -1,5 +1,5 @@
 #include "ofxSQLiteDelete.h"
-#include "lib/sqlite/sqlite3.h"
+#include "sqlite/sqlite3.h"
 #include <iostream>
 
 ofxSQLiteDelete::ofxSQLiteDelete(sqlite3* pSQLite, std::string sTable):sqlite(pSQLite), table(sTable) {

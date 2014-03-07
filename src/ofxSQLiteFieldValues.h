@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include "lib/sqlite/sqlite3.h"
+#include "sqlite/sqlite3.h"
 #include "ofxSQLiteType.h"
 #include "ofxSQLiteTypeNow.h"
 #include <iostream>

@@ -1,5 +1,5 @@
-#ifndef OFXSQLITESIMPLERH
-#define OFXSQLITESIMPLERH
+#pragma once
+
 /*
 #include <string>
 #include <iostream>
@@ -13,4 +13,3 @@ using std::endl;
 
 class ofxSQLite;
 */
-#endif
