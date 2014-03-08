@@ -132,13 +132,8 @@ ofxSQLiteSelect& ofxSQLiteSelect::begin() {
 }
 
 int ofxSQLiteSelect::next() {
-    cout << "Stepping ";
 	last_result = sqlite3_step(statement);
-
-    cout << "Last Result = " << last_result;
-
     col_index = 0; // reset column index
-
 	return last_result;
 }
 
