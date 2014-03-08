@@ -56,8 +56,7 @@ void ofApp::setup()
         // insert
         sqlite.insert("scores")
 		.use("score", 5999)
-		.use(
-             "time"
+		.use("time"
              ,ofToString(ofGetDay())
 			 +"-" +ofToString(ofGetMonth())
 			 +"-" +ofToString(ofGetYear())

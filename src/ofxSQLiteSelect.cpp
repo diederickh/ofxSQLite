@@ -94,14 +94,23 @@ std::string ofxSQLiteSelect::getLiteralQuery(bool bFillValues) {
 }
 
 ofxSQLiteSelect& ofxSQLiteSelect::execute() {
+
 	std::string sql = getLiteralQuery();
-	if (SQLITE_OK != sqlite3_prepare_v2(sqlite, sql.c_str(),-1, &statement, 0)) {
+
+    int err = sqlite3_prepare_v2(sqlite, sql.c_str(),-1, &statement, 0);
+
+    if (SQLITE_OK != err)
+    {
 		sqlite3_finalize(statement);
-		std::cout << sqlite3_errmsg(sqlite) << endl;
+
+        ofLogError("ofxSQLiteSelect::execute") << sqlite3_errmsg(sqlite);
+
 		return *this;
 	}
-	wheres.bind(statement);
-	return *this;
+
+    wheres.bind(statement);
+
+    return *this;
 }
 
 ofxSQLiteSelect& ofxSQLiteSelect::begin() {
@@ -117,31 +126,36 @@ int ofxSQLiteSelect::next() {
 }
 
 bool ofxSQLiteSelect::hasNext() {
-	if (last_result != SQLITE_DONE) {
+	if (SQLITE_DONE != last_result) {
 		return true;
 	}
-	else {
+	else
+    {
 		sqlite3_finalize(statement);
 		return false;
 	}
 }
 
 bool ofxSQLiteSelect::hasRow() {
-	return last_result == SQLITE_ROW;
+	return SQLITE_ROW == last_result;
 }
 
 std::string ofxSQLiteSelect::getString(int nIndex) {
-	std::string result = "";
-	if(last_result != SQLITE_ROW) {
-		return result;
+
+    if(SQLITE_ROW != last_result) {
+		return "";
 	}
+
 	int use_index = nIndex;
-	if(use_index == -1)
+
+    if(-1 == use_index)
+    {
 		use_index = col_index++;
-	
-	std::stringstream ss;
-	ss << sqlite3_column_text(statement, use_index);
-	return ss.str();
+	}
+
+    const unsigned char* pTxt = sqlite3_column_text(statement, use_index);
+
+    return pTxt ? reinterpret_cast<const char*>(pTxt) : "";
 }
 
 int ofxSQLiteSelect::getInt(int nIndex) {
@@ -151,18 +165,30 @@ int ofxSQLiteSelect::getInt(int nIndex) {
 	int use_index = nIndex;
 	if(use_index == -1)
 		use_index = col_index++;
+    
 	return sqlite3_column_int(statement, use_index);
 }
 
 float ofxSQLiteSelect::getFloat(int nIndex) {
-	if(last_result != SQLITE_ROW) {
+    return getDouble(nIndex);
+}
+
+double ofxSQLiteSelect::getDouble(int nIndex) {
+
+	if(SQLITE_ROW != last_result) {
 		return 0;
 	}
-	int use_index = nIndex;
+
+    int use_index = nIndex;
+
 	if(use_index == -1)
+    {
 		use_index = col_index++;
-	return sqlite3_column_double(statement, use_index);
+    }
+
+    return sqlite3_column_double(statement, use_index);
 }
+
 
 int ofxSQLiteSelect::getNumColumns() {
 	return sqlite3_column_count(statement);

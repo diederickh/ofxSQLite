@@ -85,8 +85,9 @@ class ofxSQLiteSelect {
 		string getColumnName(int nColumNum);
 		std::string getString(int nIndex = -1);
 		int getInt(int nIndex = -1);
-		float getFloat(int nIndex = -1);
-		
+        float getFloat(int nIndex = -1);
+        double getDouble(int nIndex = -1);
+
 		std::string getResultAsAsciiTable();
 	private:
 		std::vector<Join> joins;
