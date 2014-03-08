@@ -8,7 +8,8 @@
 #include "ofxSQLiteType.h"
 
 
-class ofxSQLiteTypeNow : public ofxSQLiteType {
+class ofxSQLiteTypeNow: public ofxSQLiteValue
+{
 public:
 	virtual std::string getString() const
     {
@@ -18,9 +19,10 @@ public:
 		return strm.str();
 	}
 	
-	virtual int getType() const
+	virtual DataType getType() const
     {
 		return OFX_SQLITE_TYPE_TEXT;
 	}
+    
 };
  

@@ -8,18 +8,20 @@
 #include <iostream>
 
 
-enum WhereTypes {
-		 WHERE
-		,WHERE_AND
-		,WHERE_OR
-		,WHERE_LIKE
-		,WHERE_OR_LIKE
-		,WHERE_AND_LIKE
-};
+struct Where
+{
+    enum Type
+    {
+        WHERE,
+        WHERE_AND,
+        WHERE_OR,
+        WHERE_LIKE,
+        WHERE_OR_LIKE,
+        WHERE_AND_LIKE
+    };
 
-struct Where {
-	int field_index;
-	int type;
+    int field_index;
+	Type type;
 	
 	std::string getAndOr(bool isFirstWhereClause = false) const {
 
@@ -40,7 +42,8 @@ struct Where {
 				result += " AND  ";
 			}
 		}
-		else {
+		else
+        {
 			return " WHERE "; 
 		}
 		return result;
@@ -53,21 +56,21 @@ public:
     template<typename T>
     ofxSQLiteWhere& where(const std::string& sField, const T& mValue)
     {
-        return where(sField, mValue, WHERE);
+        return where(sField, mValue, Where::WHERE);
     }
 
     template<typename T>
     ofxSQLiteWhere& orWhere(const std::string& sField, const T& mValue) {
-        return where(sField, mValue, WHERE_OR);
+        return where(sField, mValue, Where::WHERE_OR);
     }
 
     template<typename T>
     ofxSQLiteWhere& andWhere(const std::string& sField, const T& mValue) {
-        return where(sField, mValue, WHERE_AND);
+        return where(sField, mValue, Where::WHERE_AND);
     }
 
     template<typename T>
-    ofxSQLiteWhere& where(const std::string& sField, const T& mValue, int nType)
+    ofxSQLiteWhere& where(const std::string& sField, const T& mValue, Where::Type nType)
     {
         std::string field = sField;
 
@@ -77,39 +80,49 @@ public:
         std::stringstream ss(field);
         std::string part;
         std::string prev_part = "";
-        int sql_operator = 0;
-        while(ss) {
+
+        int sql_operator = 0; // Default
+
+        while(ss)
+        {
             ss >> part;
-            if(part == "<") {
+
+            if(part == "<")
+            {
                 sql_operator = OP_LESS_THAN; 
             }
-            else if(part == ">") {
+            else if(part == ">")
+            {
                 sql_operator = OP_GREATER_THAN;
             }
-            else if(part == "<=") {
+            else if(part == "<=")
+            {
                 sql_operator = OP_LESS_EQUAL_THAN;
             }
-            else if(part == ">=") {
+            else if(part == ">=")
+            {
                 sql_operator = OP_GREATER_EQUAL_THAN;
             }
             
-            if(sql_operator != 0) {
+            if(0 != sql_operator) {
                 //div = part;
                 //has_questionmark = true;
                 field = prev_part;
                 break;
             }
+
             prev_part = part;
         }
-        
+
         // when no other operator found we use the default one...
         if(0 == sql_operator) {
             sql_operator = OP_EQUAL;
         }
 
-        if(nType == WHERE_LIKE ||
-           nType == WHERE_OR_LIKE ||
-           nType == WHERE_AND_LIKE)
+        
+        if(nType == Where::WHERE_LIKE ||
+           nType == Where::WHERE_OR_LIKE ||
+           nType == Where::WHERE_AND_LIKE)
         {
             sql_operator = OP_LIKE;
         }
@@ -119,16 +132,19 @@ public:
         where_values.at(field_value_index).setOperatorType(sql_operator);
         
         struct Where where;
+
         where.type = nType;
         where.field_index = where_values.size() - 1;
         wheres.push_back(where);
+
         return *this;
     }
     
-    ofxSQLiteWhere& whereNull(const std::string& sField) {
+    ofxSQLiteWhere& whereNull(const std::string& sField)
+    {
         where_values.use(sField);
         struct Where where;
-        where.type = WHERE;
+        where.type = Where::WHERE;
         where.field_index = where_values.size() - 1;
         wheres.push_back(where);
         return *this;
@@ -146,10 +162,12 @@ public:
 
             FieldValuePair value_pair = where_values.at(counter);
             
-            if(value_pair.type == OFX_SQLITE_TYPE_NULL) {
-                result += where.getAndOr(0 == counter) +value_pair.field +" is null ";
+            if(value_pair.type == ofxSQLiteValue::OFX_SQLITE_TYPE_NULL)
+            {
+                result += where.getAndOr(0 == counter) + value_pair.field  + " is null ";
             }
-            else {
+            else
+            {
                 result += where.getAndOr(0 == counter);
                 result += value_pair.getFieldAndValueForQuery();
             }

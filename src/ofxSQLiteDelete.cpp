@@ -44,7 +44,5 @@ int ofxSQLiteDelete::execute()
 		return sqlite3_errcode(sqlite);
 	}
 
-	sqlite3_finalize(statement);
-    
-	return SQLITE_OK;
+	return sqlite3_finalize(statement);
 }
