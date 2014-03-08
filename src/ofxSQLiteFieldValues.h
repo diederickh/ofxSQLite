@@ -71,7 +71,7 @@ struct FieldValuePair {
 		sql_operator = op;
 	}
 			  
-	std::string getFieldAndValueForQuery(bool embedValue = false) {
+	std::string getFieldAndValueForQuery(bool embedValue = false) const {
 		std::string result = "";
 		std::string value_part = "";
 		
@@ -117,13 +117,13 @@ struct FieldValuePair {
 		return result;
 	}
 
-	std::string indexString() {
+	std::string indexString() const {
 		std::stringstream ss;
 		ss << index;
 		return ss.str();
 	}
 	
-	std::string valueString() {
+	std::string valueString() const {
 		std::string result = "";
 		switch(type) {
 			case OFX_SQLITE_TYPE_INT: {
@@ -156,23 +156,25 @@ struct FieldValuePair {
 class ofxSQLiteFieldValues {
 	public:
 		ofxSQLiteFieldValues();
-		int use(const std::string& sField, int nValue);
-		int use(const std::string& sField, unsigned long nValue);
-		int use(const std::string& sField, uint64_t nValue );
-		int use(const std::string& sField, float nValue);
-		int use(const std::string& sField, long nValue);
-		int use(const std::string& sField, double nValue);
-		int use(const std::string& sField, const std::string& sValue);
-		int use(const std::string& sField, const ofxSQLiteType& oValue);
-		int use(const std::string& sField);
+		std::size_t use(const std::string& sField, int nValue);
+		std::size_t use(const std::string& sField, unsigned long nValue);
+		std::size_t use(const std::string& sField, uint64_t nValue );
+		std::size_t use(const std::string& sField, float nValue);
+		std::size_t use(const std::string& sField, long nValue);
+		std::size_t use(const std::string& sField, double nValue);
+		std::size_t use(const std::string& sField, const std::string& sValue);
+		std::size_t use(const std::string& sField, const ofxSQLiteType& oValue);
+		std::size_t use(const std::string& sField);
 		void bind(sqlite3_stmt* pStatement);
 
-		FieldValuePair& at(int nIndex);
-		void begin();
-		FieldValuePair current();
+        FieldValuePair& at(std::size_t nIndex);
+        const FieldValuePair& at(std::size_t nIndex) const;
+
+        void begin();
+		FieldValuePair current() const;
 		void next();
-		bool hasNext();
-		int size();
+		bool hasNext() const;
+		std::size_t size() const;
 
 	private:
 		std::vector<FieldValuePair> field_values;

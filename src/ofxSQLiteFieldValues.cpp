@@ -5,7 +5,7 @@
 ofxSQLiteFieldValues::ofxSQLiteFieldValues():_index(0) {
 }
 
-int ofxSQLiteFieldValues::use(const std::string& sField, int nValue) {
+std::size_t ofxSQLiteFieldValues::use(const std::string& sField, int nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_INT;
@@ -15,7 +15,7 @@ int ofxSQLiteFieldValues::use(const std::string& sField, int nValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(const std::string& sField, uint64_t nValue) {
+std::size_t ofxSQLiteFieldValues::use(const std::string& sField, uint64_t nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_INT64;
@@ -25,7 +25,7 @@ int ofxSQLiteFieldValues::use(const std::string& sField, uint64_t nValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(const std::string& sField, long nValue) {
+std::size_t ofxSQLiteFieldValues::use(const std::string& sField, long nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_LONG;
@@ -35,7 +35,7 @@ int ofxSQLiteFieldValues::use(const std::string& sField, long nValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(const std::string& sField, unsigned long nValue) {
+std::size_t ofxSQLiteFieldValues::use(const std::string& sField, unsigned long nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_INT64;
@@ -45,7 +45,7 @@ int ofxSQLiteFieldValues::use(const std::string& sField, unsigned long nValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(const std::string& sField, const std::string& sValue) {
+std::size_t ofxSQLiteFieldValues::use(const std::string& sField, const std::string& sValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_TEXT;
@@ -55,7 +55,7 @@ int ofxSQLiteFieldValues::use(const std::string& sField, const std::string& sVal
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(const std::string& sField, const ofxSQLiteType& oValue) {
+std::size_t ofxSQLiteFieldValues::use(const std::string& sField, const ofxSQLiteType& oValue) {
 	switch(oValue.getType())
     {
 		case OFX_SQLITE_TYPE_INT64:
@@ -72,7 +72,7 @@ int ofxSQLiteFieldValues::use(const std::string& sField, const ofxSQLiteType& oV
 }
 
 
-int ofxSQLiteFieldValues::use(const std::string& sField, double nValue) {
+std::size_t ofxSQLiteFieldValues::use(const std::string& sField, double nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_DOUBLE;
@@ -82,7 +82,7 @@ int ofxSQLiteFieldValues::use(const std::string& sField, double nValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(const std::string& sField) {
+std::size_t ofxSQLiteFieldValues::use(const std::string& sField) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_NULL;
@@ -92,7 +92,7 @@ int ofxSQLiteFieldValues::use(const std::string& sField) {
 }
 
 
-int ofxSQLiteFieldValues::use(const std::string& sField, float nValue) {
+std::size_t ofxSQLiteFieldValues::use(const std::string& sField, float nValue) {
 	return use(sField, (double)nValue);
 	
 }
@@ -101,23 +101,27 @@ void ofxSQLiteFieldValues::begin() {
 	_index = 0;
 }
 
-bool ofxSQLiteFieldValues::hasNext() {
-	return (_index < field_values.size());
+bool ofxSQLiteFieldValues::hasNext() const {
+	return _index < field_values.size();
 }
 
 void ofxSQLiteFieldValues::next() {
 	if (hasNext()) _index++;
 }
 
-FieldValuePair ofxSQLiteFieldValues::current() {
+FieldValuePair ofxSQLiteFieldValues::current() const {
 	return field_values[_index];
 }
 
-FieldValuePair& ofxSQLiteFieldValues::at(int nIndex) {
+FieldValuePair& ofxSQLiteFieldValues::at(std::size_t nIndex) {
 	return field_values[nIndex];
 }
 
-int ofxSQLiteFieldValues::size() {
+const FieldValuePair& ofxSQLiteFieldValues::at(std::size_t nIndex) const {
+	return field_values[nIndex];
+}
+
+std::size_t ofxSQLiteFieldValues::size() const {
 	return field_values.size();
 }
 
@@ -131,8 +135,12 @@ void ofxSQLiteFieldValues::bind(sqlite3_stmt* pStatement) {
 
 int ofxSQLiteFieldValues::nextFieldIndex() {
 	static int field_count = 1;
+
 	field_count++;
+
 	if(field_count >= 999) // you can only insert 999 columns
-		field_count = 1;
+    {
+        field_count = 1;
+    }
 	return field_count;
 }

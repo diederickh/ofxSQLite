@@ -21,9 +21,12 @@ struct Where {
 	int field_index;
 	int type;
 	
-	std::string getAndOr(bool isFirstWhereClause = false) {
+	std::string getAndOr(bool isFirstWhereClause = false) const {
+
 		std::string result;
-		if(!isFirstWhereClause) {
+
+        if(!isFirstWhereClause)
+        {
 			if(type == WHERE_AND) {
 				result += " AND ";
 			}
@@ -100,7 +103,7 @@ public:
         }
         
         // when no other operator found we use the default one...
-        if(sql_operator == 0) {
+        if(0 == sql_operator) {
             sql_operator = OP_EQUAL;
         }
 
@@ -131,19 +134,23 @@ public:
         return *this;
     }
             
-    std::string getLiteralQuery(bool bFillValues = false) {
+    std::string getLiteralQuery(bool bFillValues = false) const
+    {
         std::string result = "";
-        std::vector<Where>::iterator it = wheres.begin();
-        int counter = 0;
-        while(it != wheres.end()) {
-            Where& where = *it;
+        std::vector<Where>::const_iterator it = wheres.begin();
+        std::size_t counter = 0;
+
+        while(it != wheres.end())
+        {
+            const Where& where = *it;
+
             FieldValuePair value_pair = where_values.at(counter);
             
             if(value_pair.type == OFX_SQLITE_TYPE_NULL) {
-                result += where.getAndOr(counter == 0) +value_pair.field +" is null ";
+                result += where.getAndOr(0 == counter) +value_pair.field +" is null ";
             }
             else {
-                result += where.getAndOr(counter == 0);
+                result += where.getAndOr(0 == counter);
                 result += value_pair.getFieldAndValueForQuery();
             }
             ++counter;
@@ -156,7 +163,7 @@ public:
         where_values.bind(pStatement);
     }
 
-    int size() {
+    std::size_t size() const {
         return where_values.size();
     }
 

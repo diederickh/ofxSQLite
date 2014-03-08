@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <inttypes.h>
 
 enum {
  	 OFX_SQLITE_TYPE_INT
