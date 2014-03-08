@@ -12,7 +12,7 @@ ofxSQLiteInsert::ofxSQLiteInsert(sqlite3* pSQLite,
 {
 }
 
-ofxSQLiteFieldValues ofxSQLiteInsert::getFields() {
+ofxSQLiteFieldValues ofxSQLiteInsert::getFields() const {
 	return field_values;
 }
 
