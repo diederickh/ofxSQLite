@@ -25,7 +25,11 @@ void ofxSQLite::setup(const std::string& sDB)
 int ofxSQLite::simpleQuery(const std::string& SQL) {
 	sqlite3_stmt* statement;
 
-	if (SQLITE_OK != sqlite3_prepare_v2(db, SQL.c_str(), -1, &statement, 0)) {
+    int err = sqlite3_prepare_v2(db, SQL.c_str(), SQL.length(), &statement, 0);
+
+	if (SQLITE_OK != err)
+    {
+        sqlite3_finalize(statement);
 		return sqlite3_errcode(db);
 	}
 
