@@ -9,17 +9,29 @@ ofxSQLite::ofxSQLite():
 }
 
 
-void ofxSQLite::setup(const std::string& sDB)
+bool ofxSQLite::setup(const std::string& sDB)
 {
 	db_file = ofToDataPath(sDB, true);
 
-	if (SQLITE_OK != sqlite3_open(db_file.c_str(), &db))
+    int err = sqlite3_open(db_file.c_str(), &db);
+
+	if (SQLITE_OK != err)
     {
         ofLogError("ofxSQLite::setup") << sqlite3_errmsg(db);
         db = 0;
+        return false;
 	}
+    else
+    {
+        ofLogVerbose("ofxSQLite::setup") << "opened:" << db_file << endl;
+        return true;
+    }
 
-    ofLogVerbose("ofxSQLite::setup") << "opened:" << db_file << endl;
+}
+
+bool ofxSQLite::isLoaded() const
+{
+    return 0 != db;
 }
 
 int ofxSQLite::simpleQuery(const std::string& SQL) {
@@ -54,12 +66,12 @@ ofxSQLiteSelect	ofxSQLite::select(const std::string& sFields) {
 	return ofxSQLiteSelect(db).select(sFields);;
 }
 
-std::string ofxSQLite::getError() {
+std::string ofxSQLite::getError() const {
     const char* err = sqlite3_errmsg(db);
     return err ? err : "Unknown Error";
 }
 
-int ofxSQLite::lastInsertID() {
+sqlite_int64 ofxSQLite::lastInsertID() const {
 	return sqlite3_last_insert_rowid(db);
 }
 

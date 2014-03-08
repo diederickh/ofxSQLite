@@ -31,17 +31,21 @@ class ofxSQLiteSimpler;
 class ofxSQLite {
 public:
     ofxSQLite();
-    void setup(const std::string& sDB);
+    bool setup(const std::string& sDB);
+
+    bool isLoaded() const;
+
     ofxSQLiteInsert insert(const std::string& sTable);
     ofxSQLiteUpdate update(const std::string& sTable);
     ofxSQLiteDelete remove(const std::string& sTable);
     ofxSQLiteSelect select(const std::string& sFields);
+
     void printTable(const std::string& sTable);
-    
+
     ofxSQLiteSimpler operator[](const std::string& sKeyValue);
     
-    int lastInsertID();
-    std::string getError();
+    sqlite_int64 lastInsertID() const;
+    std::string getError() const;
 
     int simpleQuery(const std::string& SQL);
 
