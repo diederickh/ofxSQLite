@@ -6,8 +6,10 @@
 #include <iomanip>
 #include <sstream>
 #include "sqlite/sqlite3.h"
+#include "ofLog.h"
 #include "ofxSQLiteFieldValues.h"
 #include "ofxSQLiteWhere.h"
+
 
 
 using namespace std;
@@ -28,38 +30,40 @@ class ofxSQLiteSelect {
 		ofxSQLiteSelect(sqlite3* pSQLite);
 
 		// create select query
-		ofxSQLiteSelect& select(std::string sFields);
-		ofxSQLiteSelect& from(std::string sFrom);
-		ofxSQLiteSelect& join(std::string sTable, std::string sOnField, std::string sFields);
+		ofxSQLiteSelect& select(const std::string& sFields);
+		ofxSQLiteSelect& from(const std::string& sFrom);
+		ofxSQLiteSelect& join(const std::string& sTable,
+                              const std::string& sOnField,
+                              const std::string& sFields);
 
 		// where clause..
 		template<typename T>
-		ofxSQLiteSelect& where(std::string sField, T mValue) {
+		ofxSQLiteSelect& where(const std::string& sField, T mValue) {
 			return where(sField, mValue, WHERE);
 		}
 		
 		template<typename T>
-		ofxSQLiteSelect& orWhere(std::string sField, T mValue) {
+		ofxSQLiteSelect& orWhere(const std::string& sField, T mValue) {
 			return where(sField, mValue, WHERE_OR);
 		}
 		
 		template<typename T>
-		ofxSQLiteSelect& orLike(std::string sField, T mValue) {
+		ofxSQLiteSelect& orLike(const std::string& sField, T mValue) {
 			return where(sField, mValue, WHERE_OR_LIKE);
 		}
 				
 		template<typename T>
-		ofxSQLiteSelect& andWhere(std::string sField, T mValue) {
+		ofxSQLiteSelect& andWhere(const std::string& sField, T mValue) {
 			return where(sField, mValue, WHERE_AND);
 		}
 		
 		template<typename T>
-		ofxSQLiteSelect& where(std::string sField, T mValue, int nType) {
+		ofxSQLiteSelect& where(const std::string& sField, T mValue, int nType) {
 			wheres.where(sField, mValue, nType);
 			return *this;
 		}
 		
-		ofxSQLiteSelect& whereNull(std::string sField) {
+		ofxSQLiteSelect& whereNull(const std::string& sField) {
 			wheres.whereNull(sField);
 			return *this;
 		}
@@ -67,8 +71,8 @@ class ofxSQLiteSelect {
 		ofxSQLiteSelect& limit(int nCount, int nOffset);
 		ofxSQLiteSelect& limit(int nCount);
 
-		ofxSQLiteSelect& order(std::string sField);
-		ofxSQLiteSelect& order(std::string sField, std::string sOrder);
+		ofxSQLiteSelect& order(const std::string& sField);
+		ofxSQLiteSelect& order(const std::string& sField, const std::string& sOrder);
 
 		// execution
 		ofxSQLiteSelect& execute();

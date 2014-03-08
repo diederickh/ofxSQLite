@@ -5,7 +5,7 @@
 ofxSQLiteFieldValues::ofxSQLiteFieldValues():_index(0) {
 }
 
-int ofxSQLiteFieldValues::use(std::string sField, int nValue) {
+int ofxSQLiteFieldValues::use(const std::string& sField, int nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_INT;
@@ -15,7 +15,7 @@ int ofxSQLiteFieldValues::use(std::string sField, int nValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(std::string sField, uint64_t nValue) {
+int ofxSQLiteFieldValues::use(const std::string& sField, uint64_t nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_INT64;
@@ -25,7 +25,7 @@ int ofxSQLiteFieldValues::use(std::string sField, uint64_t nValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(std::string sField, long nValue) {
+int ofxSQLiteFieldValues::use(const std::string& sField, long nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_LONG;
@@ -35,7 +35,7 @@ int ofxSQLiteFieldValues::use(std::string sField, long nValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(std::string sField, unsigned long nValue) {
+int ofxSQLiteFieldValues::use(const std::string& sField, unsigned long nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_INT64;
@@ -45,7 +45,7 @@ int ofxSQLiteFieldValues::use(std::string sField, unsigned long nValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(std::string sField, std::string sValue) {
+int ofxSQLiteFieldValues::use(const std::string& sField, const std::string& sValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_TEXT;
@@ -55,19 +55,24 @@ int ofxSQLiteFieldValues::use(std::string sField, std::string sValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(std::string sField, ofxSQLiteType& oValue) {
-	switch(oValue.getType()) {
-		case OFX_SQLITE_TYPE_INT64: return use(sField, oValue.getUint64()); break;
-		case OFX_SQLITE_TYPE_LONG: return use(sField, oValue.getLong());break;
-		case OFX_SQLITE_TYPE_INT: return use(sField, oValue.getInt()); break;
-		case OFX_SQLITE_TYPE_TEXT: return use(sField,oValue.getString()); break;
-		default: break;
-	};
-	return 0; 
+int ofxSQLiteFieldValues::use(const std::string& sField, const ofxSQLiteType& oValue) {
+	switch(oValue.getType())
+    {
+		case OFX_SQLITE_TYPE_INT64:
+            return use(sField, oValue.getUint64());
+		case OFX_SQLITE_TYPE_LONG:
+            return use(sField, oValue.getLong());
+		case OFX_SQLITE_TYPE_INT:
+            return use(sField, oValue.getInt());
+		case OFX_SQLITE_TYPE_TEXT:
+            return use(sField, oValue.getString());
+		default:
+            return 0;
+	}
 }
 
 
-int ofxSQLiteFieldValues::use(std::string sField, double nValue) {
+int ofxSQLiteFieldValues::use(const std::string& sField, double nValue) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_DOUBLE;
@@ -77,7 +82,7 @@ int ofxSQLiteFieldValues::use(std::string sField, double nValue) {
 	return field_values.size()-1;
 }
 
-int ofxSQLiteFieldValues::use(std::string sField) {
+int ofxSQLiteFieldValues::use(const std::string& sField) {
 	FieldValuePair field;
 	field.field			= sField;
 	field.type 			= OFX_SQLITE_TYPE_NULL;
@@ -87,7 +92,7 @@ int ofxSQLiteFieldValues::use(std::string sField) {
 }
 
 
-int ofxSQLiteFieldValues::use(std::string sField, float nValue) {
+int ofxSQLiteFieldValues::use(const std::string& sField, float nValue) {
 	return use(sField, (double)nValue);
 	
 }

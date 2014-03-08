@@ -156,15 +156,15 @@ struct FieldValuePair {
 class ofxSQLiteFieldValues {
 	public:
 		ofxSQLiteFieldValues();
-		int use(std::string sField, int nValue);
-		int use(std::string sField, unsigned long nValue);
-		int use(std::string sField, uint64_t nValue );
-		int use(std::string sField, float nValue);
-		int use(std::string sField, long nValue);
-		int use(std::string sField, double nValue);
-		int use(std::string sField, std::string sValue);
-		int use(std::string sField, ofxSQLiteType& oValue);
-		int use(std::string sField);
+		int use(const std::string& sField, int nValue);
+		int use(const std::string& sField, unsigned long nValue);
+		int use(const std::string& sField, uint64_t nValue );
+		int use(const std::string& sField, float nValue);
+		int use(const std::string& sField, long nValue);
+		int use(const std::string& sField, double nValue);
+		int use(const std::string& sField, const std::string& sValue);
+		int use(const std::string& sField, const ofxSQLiteType& oValue);
+		int use(const std::string& sField);
 		void bind(sqlite3_stmt* pStatement);
 
 		FieldValuePair& at(int nIndex);

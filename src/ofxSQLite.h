@@ -19,7 +19,6 @@
 #include "ofUtils.h"
 
 #include "ofxSQLiteTypeNow.h"
-
 #include "ofxSQLiteInsert.h"
 #include "ofxSQLiteUpdate.h"
 #include "ofxSQLiteDelete.h"
@@ -53,50 +52,5 @@ public:
 private:
     sqlite3* db;
     std::string db_file;
-
-};
-
-
-class ofxSQLiteSimpler {
-public:
-	ofxSQLiteSimpler(ofxSQLite& rDB, const std::string& sTable):
-        db(rDB),
-        table(sTable)
-	{
-	}
-	
-	template<typename T>
-	ofxSQLiteSelect find(const std::string& sWhereField,
-                         T mWhereValue,
-                         const std::string& sSelectFields = "*")
-    {
-		ofxSQLiteSelect sel = db.select(sSelectFields).from(table).where(sWhereField, mWhereValue).execute();
-		return sel;
-	}
-	
-	// example: db["pakbox_users"].findOne("pu_id", 68, "pu_name").getString(0);
-	template<typename T>
-	ofxSQLiteSelect findOne(const std::string& sWhereField,
-                            T mWhereValue,
-                            const std::string& sSelectFields = "*")
-    {
-		ofxSQLiteSelect sel = db
-			.select(sSelectFields)
-			.from(table)
-			.where(sWhereField, mWhereValue)
-			.limit(1)
-			.execute()
-			.begin();
-		
-		return sel;
-	}
-	
-	void print(){
-		cout << db.select("*").from(table).execute().getResultAsAsciiTable();
-	}
-	
-private:
-	ofxSQLite& db;
-    std::string table;
 
 };

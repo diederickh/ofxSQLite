@@ -5,12 +5,14 @@
 ofxSQLiteSelect::ofxSQLiteSelect(sqlite3* pSQLite):sqlite(pSQLite),limit_offset(0),limit_count(0) {
 }
 
-ofxSQLiteSelect& ofxSQLiteSelect::select(std::string sFields) {
+ofxSQLiteSelect& ofxSQLiteSelect::select(const std::string& sFields) {
 	fields = sFields;
 	return *this;
 }
 
-ofxSQLiteSelect& ofxSQLiteSelect::join(std::string sTable ,std::string sOnField, std::string sFields) {
+ofxSQLiteSelect& ofxSQLiteSelect::join(const std::string& sTable,
+                                       const std::string& sOnField,
+                                       const std::string& sFields) {
 	struct Join join = {
 		sTable
 		,sOnField
@@ -20,11 +22,12 @@ ofxSQLiteSelect& ofxSQLiteSelect::join(std::string sTable ,std::string sOnField,
 	return *this;
 }
 
-ofxSQLiteSelect& ofxSQLiteSelect::order(std::string sField) {
+ofxSQLiteSelect& ofxSQLiteSelect::order(const std::string& sField) {
 	return order(sField, "ASC");
 }
 
-ofxSQLiteSelect& ofxSQLiteSelect::order(std::string sField, std::string sOrder) {
+ofxSQLiteSelect& ofxSQLiteSelect::order(const std::string& sField,
+                                        const std::string& sOrder) {
 	struct Order order;
 	order.field = sField;
 	order.order = sOrder;
@@ -32,7 +35,7 @@ ofxSQLiteSelect& ofxSQLiteSelect::order(std::string sField, std::string sOrder) 
 	return *this;
 }
 
-ofxSQLiteSelect& ofxSQLiteSelect::from(std::string sFrom) {
+ofxSQLiteSelect& ofxSQLiteSelect::from(const std::string& sFrom) {
 	from_table = sFrom;
 	return *this;
 }
@@ -49,8 +52,11 @@ ofxSQLiteSelect& ofxSQLiteSelect::limit(int nCount, int nOffset) {
 
 std::string ofxSQLiteSelect::getLiteralQuery(bool bFillValues) {
 	// inner joins.
+
 	std::string inner_joins = "";
-	for (int i = 0; i < joins.size(); ++i) {
+
+    for (int i = 0; i < joins.size(); ++i) {
+        
 		fields += ", " +joins[i].fields;
 		inner_joins = " INNER JOIN " +joins[i].table +" ON " +joins[i].condition;
 	}
@@ -142,7 +148,7 @@ bool ofxSQLiteSelect::hasRow() {
 
 std::string ofxSQLiteSelect::getString(int nIndex) {
 
-    if(SQLITE_ROW != last_result) {
+	if(SQLITE_ROW != last_result) {
 		return "";
 	}
 
@@ -159,7 +165,7 @@ std::string ofxSQLiteSelect::getString(int nIndex) {
 }
 
 int ofxSQLiteSelect::getInt(int nIndex) {
-	if(last_result != SQLITE_ROW) {
+	if(SQLITE_ROW != last_result) {
 		return 0;
 	}
 	int use_index = nIndex;
@@ -194,7 +200,7 @@ int ofxSQLiteSelect::getNumColumns() {
 	return sqlite3_column_count(statement);
 }
 
-string ofxSQLiteSelect::getColumnName(int nColumnNum) {
+std::string ofxSQLiteSelect::getColumnName(int nColumnNum) {
 	const char* column_txt = sqlite3_column_name(statement, nColumnNum);
 	return column_txt;
 }
@@ -204,11 +210,12 @@ std::string ofxSQLiteSelect::getResultAsAsciiTable() {
 	
 	// get the biggest width per column and store the results.
 	int num_cols = sqlite3_column_count(statement);
-	vector<vector<string> > results;
-	vector<int> widths;
+    std::vector<std::vector<string> > results;
+	std::vector<int> widths;
 	widths.assign(num_cols, 0);
-	while(sqlite3_step(statement) == SQLITE_ROW) {
-		vector<string> row_results;
+
+	while(SQLITE_ROW == sqlite3_step(statement)) {
+        std::vector<string> row_results;
 		
 		for(int i = 0; i < num_cols; ++i) {
 			// @todo do we have a memory leak here?
@@ -227,14 +234,20 @@ std::string ofxSQLiteSelect::getResultAsAsciiTable() {
 		results.push_back(row_results);
 	}
 
-	stringstream ss;
-	for(int i = 0; i < results.size(); ++i) {
-		vector<string> row = results[i];
-		for(int c = 0; c < row.size(); ++c) {
+    std::stringstream ss;
+
+	for(int i = 0; i < results.size(); ++i)
+    {
+		std::vector<string> row = results[i];
+
+		for(int c = 0; c < row.size(); ++c)
+        {
 			int col_width = widths[c];
 			ss <<  setw(col_width)  << row[c] <<  "  |" ;
 		}
+
 		ss << endl;
 	}
+
 	return ss.str();
 }

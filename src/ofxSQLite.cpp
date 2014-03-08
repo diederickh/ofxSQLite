@@ -1,4 +1,5 @@
 #include "ofxSQLite.h"
+#include "ofxSQLiteSimpler.h"
 
 
 ofxSQLite::ofxSQLite():
@@ -46,9 +47,7 @@ ofxSQLiteDelete ofxSQLite::remove(const std::string& sTable) {
 }
 
 ofxSQLiteSelect	ofxSQLite::select(const std::string& sFields) {
-	ofxSQLiteSelect select = ofxSQLiteSelect(db);
-	select.select(sFields);
-	return select;
+	return ofxSQLiteSelect(db).select(sFields);;
 }
 
 std::string ofxSQLite::getError() {
@@ -61,10 +60,9 @@ int ofxSQLite::lastInsertID() {
 }
 
 ofxSQLiteSimpler ofxSQLite::operator[](const std::string& sKeyValue) {
-	ofxSQLiteSimpler simple(*this, sKeyValue);
-	return simple;
+	return ofxSQLiteSimpler(*this, sKeyValue);
 }
 
 void ofxSQLite::printTable(const std::string& sTable) {
-	cout << select("*").from(sTable).execute().getResultAsAsciiTable();
+    std::cout << select("*").from(sTable).execute().getResultAsAsciiTable();
 }

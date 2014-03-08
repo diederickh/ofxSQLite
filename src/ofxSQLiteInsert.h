@@ -10,12 +10,12 @@ class sqlite3;
 
 class ofxSQLiteInsert {
 public:
-    ofxSQLiteInsert(sqlite3* pSQLite, std::string sTable);
+    ofxSQLiteInsert(sqlite3* pSQLite, const std::string& sTable);
     std::string getLiteralQuery();
     ofxSQLiteFieldValues getFields();
 
     template<typename T>
-    ofxSQLiteInsert& use(std::string sField, T sValue) {
+    ofxSQLiteInsert& use(const std::string& sField, const T& sValue) {
         field_values.use(sField, sValue);
         return *this;
     }

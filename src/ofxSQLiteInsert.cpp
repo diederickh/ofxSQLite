@@ -5,7 +5,7 @@
 
 
 ofxSQLiteInsert::ofxSQLiteInsert(sqlite3* pSQLite,
-                                 std::string sTable):
+                                 const std::string& sTable):
     sqlite(pSQLite),
     table(sTable),
     pair_count(0)
