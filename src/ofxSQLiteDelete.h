@@ -19,25 +19,26 @@ public:
     }
 
     std::string getLiteralQuery(bool bFillValues = false);
+
     int execute();
 
     // where clause..
     template<typename T>
     ofxSQLiteDelete& where(const std::string& sField, const T& mValue) {
-        return where(sField, mValue, WHERE);
+        return where(sField, mValue, Where::WHERE);
     }
     template<typename T>
     ofxSQLiteDelete& orWhere(const std::string& sField, const T& mValue) {
-        return where(sField, mValue, WHERE_OR);
+        return where(sField, mValue, Where::WHERE_OR);
     }
     template<typename T>
     ofxSQLiteDelete& andWhere(const std::string& sField, const T& mValue) {
-        return where(sField, mValue, WHERE_AND);
+        return where(sField, mValue, Where::WHERE_AND);
     }
     template<typename T>
     ofxSQLiteDelete& where(const std::string& sField,
                            const T& mValue,
-                           int nType)
+                           Where::Type nType)
     {
         wheres.where(sField, mValue, nType);
         return *this;
