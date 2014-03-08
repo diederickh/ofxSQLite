@@ -166,6 +166,8 @@ public:
     std::size_t size() const;
 
 private:
+    std::size_t _field_count;
+
     int nextFieldIndex();
     std::vector<FieldValuePair> _field_values;
     std::size_t _index;

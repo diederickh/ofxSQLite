@@ -3,7 +3,8 @@
 #include <sstream>
 
 ofxSQLiteFieldValues::ofxSQLiteFieldValues():
-    _index(0)
+    _index(0),
+    _field_count(1)
 {
 }
 
@@ -147,14 +148,12 @@ void ofxSQLiteFieldValues::bind(sqlite3_stmt* pStatement) {
 }
 
 int ofxSQLiteFieldValues::nextFieldIndex() {
-	static std::size_t field_count = 1;
+	_field_count++;
 
-	field_count++;
-
-	if(field_count >= 999) // you can only insert 999 columns
+	if(_field_count >= 999) // you can only insert 999 columns
     {
-        field_count = 1;
+        _field_count = 1;
     }
 
-	return field_count;
+	return _field_count;
 }
