@@ -24,12 +24,10 @@ bool ofxSQLite::setup(const std::string& sDB)
 
     if (db && SQLITE_OK != sqlite3_close(db))
     {
-            ofLogError("ofxSQLite::setup") << sqlite3_errmsg(db);
+        ofLogError("ofxSQLite::setup") << sqlite3_errmsg(db);
     }
 
-    int err = sqlite3_open(db_file.c_str(), &db);
-
-	if (SQLITE_OK != err)
+	if (SQLITE_OK != sqlite3_open(db_file.c_str(), &db))
     {
         ofLogError("ofxSQLite::setup") << sqlite3_errmsg(db);
         db = 0;
