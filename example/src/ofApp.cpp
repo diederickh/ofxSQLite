@@ -3,149 +3,151 @@
 
 void ofApp::setup()
 {
-        sqlite.setup("test.db");
+    ofSetLogLevel(OF_LOG_VERBOSE);
 
-        sqlite.simpleQuery(""\
-                            "CREATE TABLE IF NOT EXISTS scores (" \
-                            " id INTEGER PRIMARY KEY AUTOINCREMENT" \
-                            " ,time TEXT" \
-                            ", score INTEGER" \
-                            ");"
-                            );
+    sqlite.setup("test.db");
 
-        sqlite.simpleQuery(""\
-                            "CREATE TABLE IF NOT EXISTS stats ("\
-                            "id INTEGER PRIMARY KEY AUTOINCREMENT" \
-                            ", time TEXT" \
-                            ");"
-                            );
+    sqlite.simpleQuery(""\
+                        "CREATE TABLE IF NOT EXISTS scores (" \
+                        " id INTEGER PRIMARY KEY AUTOINCREMENT" \
+                        " ,time TEXT" \
+                        ", score INTEGER" \
+                        ");"
+                        );
 
-        sqlite.simpleQuery(""\
-                            "CREATE TABLE IF NOT EXISTS game_runs( " \
-                            " id INTEGER PRIMARY KEY AUTOINCREMENT" \
-                            ",start_time TEXT" \
-                            ", end_time TEXT" \
-                            ");"
-                            );
+    sqlite.simpleQuery(""\
+                        "CREATE TABLE IF NOT EXISTS stats ("\
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT" \
+                        ", time TEXT" \
+                        ");"
+                        );
 
-        if (SQLITE_OK != sqlite.simpleQuery(""\
-                                             "CREATE TABLE IF NOT EXISTS game_run_data( " \
-                                             " gid INTEGER PRIMARY KEY AUTOINCREMENT" \
-                                             ",runid INTEGER" \
-                                             ",gdata TEXT" \
-                                             ");"
-                                             )) {
-            cout << "ERROR CREATE TABLE\n";
-        }
+    sqlite.simpleQuery(""\
+                        "CREATE TABLE IF NOT EXISTS game_runs( " \
+                        " id INTEGER PRIMARY KEY AUTOINCREMENT" \
+                        ",start_time TEXT" \
+                        ", end_time TEXT" \
+                        ");"
+                        );
 
-        // insert
-        sqlite.insert("game_runs")
-		.use("start_time", "today")
-		.use("end_time","tomorrow")
-        .execute();
+    if (SQLITE_OK != sqlite.simpleQuery(""\
+                                         "CREATE TABLE IF NOT EXISTS game_run_data( " \
+                                         " gid INTEGER PRIMARY KEY AUTOINCREMENT" \
+                                         ",runid INTEGER" \
+                                         ",gdata TEXT" \
+                                         ");"
+                                         )) {
+        cout << "ERROR CREATE TABLE\n";
+    }
 
-        // lastInsertID
-        int last_run_id = sqlite.lastInsertID();
-        sqlite.insert("game_run_data")
-		.use("runid",last_run_id)
-		.use("gdata", "MyData")
-        .execute();
+    // insert
+    sqlite.insert("game_runs")
+    .use("start_time", "today")
+    .use("end_time","tomorrow")
+    .execute();
 
-        cout << "insert into game_run_data error: " << sqlite.getError() << endl;
+    // lastInsertID
+    int last_run_id = sqlite.lastInsertID();
+    sqlite.insert("game_run_data")
+    .use("runid",last_run_id)
+    .use("gdata", "MyData")
+    .execute();
 
-        // insert
-        sqlite.insert("scores")
-		.use("score", 5999)
-		.use("time"
-             ,ofToString(ofGetDay())
-			 +"-" +ofToString(ofGetMonth())
-			 +"-" +ofToString(ofGetYear())
-			 +" " +ofToString(ofGetHours())
-			 +":" +ofToString(ofGetMinutes())
-			 +":" +ofToString(ofGetSeconds())
-             ).execute();
+    cout << "insert into game_run_data error: " << sqlite.getError() << endl;
 
-        // get last inserted row id
-        cout << "inserted row id: " << sqlite.lastInsertID() << endl;
+    // insert
+    sqlite.insert("scores")
+    .use("score", 5999)
+    .use("time"
+         ,ofToString(ofGetDay())
+         +"-" +ofToString(ofGetMonth())
+         +"-" +ofToString(ofGetYear())
+         +" " +ofToString(ofGetHours())
+         +":" +ofToString(ofGetMinutes())
+         +":" +ofToString(ofGetSeconds())
+         ).execute();
 
-        ofxSQLiteSelect sel = sqlite.select("id, time").from("scores");
+    // get last inserted row id
+    cout << "inserted row id: " << sqlite.lastInsertID() << endl;
 
-        sel.execute().begin();
+    ofxSQLiteSelect sel = sqlite.select("id, time").from("scores");
 
-        while(sel.hasNext())
-        {
-            int id = sel.getInt();
-            std::string name = sel.getString();
-            cout << id << ", " << name << endl;
-            sel.next();
-        }
+    sel.execute().begin();
 
-        // select
-        sel = sqlite.select("id, start_time")
-		.from("game_runs")
-		.join("game_run_data", "runid = id", "runid, gdata")
-		.where("runid", 3)
-		.orWhere("runid",13)
-		.orWhere("runid", last_run_id)
-		//.limit(5)
-		.order("runid", " DESC ")
-		.execute().begin();
+    while(sel.hasNext())
+    {
+        int id = sel.getInt();
+        std::string name = sel.getString();
+        cout << id << ", " << name << endl;
+        sel.next();
+    }
 
-        while(sel.hasNext()) {
-            int runid = sel.getInt();
-            string gdata = sel.getString();
-            cout << "runid: " << runid << ", gdata: " << gdata << endl;
-            sel.next();
-        }
+    // select
+    sel = sqlite.select("id, start_time")
+    .from("game_runs")
+    .join("game_run_data", "runid = id", "runid, gdata")
+    .where("runid", 3)
+    .orWhere("runid",13)
+    .orWhere("runid", last_run_id)
+    //.limit(5)
+    .order("runid", " DESC ")
+    .execute().begin();
 
-        // update
-        sqlite.update("game_runs")
-		.use("end_time", "past")
-		.where("id", last_run_id)
-		.execute();
+    while(sel.hasNext()) {
+        int runid = sel.getInt();
+        string gdata = sel.getString();
+        cout << "runid: " << runid << ", gdata: " << gdata << endl;
+        sel.next();
+    }
+
+    // update
+    sqlite.update("game_runs")
+    .use("end_time", "past")
+    .where("id", last_run_id)
+    .execute();
 
 
-        // delete
-        sqlite.remove("game_runs")
-		.where("id",last_run_id)
-		.execute();
+    // delete
+    sqlite.remove("game_runs")
+    .where("id",last_run_id)
+    .execute();
 
-        // auto increment field and auto-timestamp field. on each insert
-        // the value for date_created is added automatically.
-        // -------------------------------------------------------------------------
-        if (SQLITE_OK != sqlite.simpleQuery(""\
-                                             "CREATE TABLE IF NOT EXISTS  photos( " \
-                                             " id INTEGER PRIMARY KEY AUTOINCREMENT" \
-                                             ",old_name VARCHAR(255)" \
-                                             ",new_name VARCHAR(255)" \
-                                             ",dir_name VARCHAR(255)" \
-                                             ",file_path VARCHAR(255)" \
-                                             ",synchronized BOOLEAN" \
-                                             ",date_synchronized DATETIME" \
-                                             ",date_created DATETIME DEFAULT CURRENT_TIMESTAMP" \
-                                             ");"
-                                             ))
-        {
-            cout << "ERROR CREATE TABLE\n";
-        }
+    // auto increment field and auto-timestamp field. on each insert
+    // the value for date_created is added automatically.
+    // -------------------------------------------------------------------------
+    if (SQLITE_OK != sqlite.simpleQuery(""\
+                                         "CREATE TABLE IF NOT EXISTS  photos( " \
+                                         " id INTEGER PRIMARY KEY AUTOINCREMENT" \
+                                         ",old_name VARCHAR(255)" \
+                                         ",new_name VARCHAR(255)" \
+                                         ",dir_name VARCHAR(255)" \
+                                         ",file_path VARCHAR(255)" \
+                                         ",synchronized BOOLEAN" \
+                                         ",date_synchronized DATETIME" \
+                                         ",date_created DATETIME DEFAULT CURRENT_TIMESTAMP" \
+                                         ");"
+                                         ))
+    {
+        cout << "ERROR CREATE TABLE\n";
+    }
 
-        // just pasted this example here from a project I did.. (did no test it,
-        // but shows you some things you can do with sqlite tables
-        // ------------------------------------------------------------------------
-        int r = sqlite.simpleQuery("CREATE TABLE IF NOT EXISTS tweets (" \
-                                    " id INTEGER PRIMARY KEY AUTOINCREMENT " \
-                                    ",avatar VARCHAR(255) " \
-                                    ",user_id VARCHAR(100) " \
-                                    ",screen_name VARCHAR(50)" \
-                                    ",tweet_id VARCHAR(50) " \
-                                    ",date_created DATETIME DEFAULT CURRENT_TIMESTAMP "\
-                                    ",date_exported DATETIME "\
-                                    ",contains_face BOOLEAN " \
-                                    ",is_used BOOLEAN " \
-                                    ",is_fetched BOOLEAN " \
-                                    ",is_exported BOOLEAN " \
-                                    ");"
-                                    );
+    // just pasted this example here from a project I did.. (did no test it,
+    // but shows you some things you can do with sqlite tables
+    // ------------------------------------------------------------------------
+    int r = sqlite.simpleQuery("CREATE TABLE IF NOT EXISTS tweets (" \
+                                " id INTEGER PRIMARY KEY AUTOINCREMENT " \
+                                ",avatar VARCHAR(255) " \
+                                ",user_id VARCHAR(100) " \
+                                ",screen_name VARCHAR(50)" \
+                                ",tweet_id VARCHAR(50) " \
+                                ",date_created DATETIME DEFAULT CURRENT_TIMESTAMP "\
+                                ",date_exported DATETIME "\
+                                ",contains_face BOOLEAN " \
+                                ",is_used BOOLEAN " \
+                                ",is_fetched BOOLEAN " \
+                                ",is_exported BOOLEAN " \
+                                ");"
+                                );
 
 //        // inserting mass amount of entries: use transations
 //        // -------------------------------------------------------------------------
@@ -211,5 +213,24 @@ void ofApp::setup()
          ofLog(OF_LOG_ERROR, "error: cannot set export to true");
          }
          */
+
+}
+
+void ofApp::draw()
+{
+    ofBackground(0);
+
+    ofEnableAlphaBlending();
+
+    for (int i=0; i<100; i++) {
+        // This should be a shade of orange but it's red
+        ofSetColor(255, 132, 0, 1);
+        ofCircle(ofGetWidth()/3.0, ofGetHeight()/2.0, ofGetWidth()/6.0);
+
+        // This should be a shade orange and it is.
+        ofSetColor(255, 132, 0, 2);
+        ofCircle(ofGetWidth()*2.0/3.0, ofGetHeight()/2.0, ofGetWidth()/6.0);
+    }
+
 
 }

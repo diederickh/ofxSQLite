@@ -1,23 +1,11 @@
-/**
- * When compiling the sqlite.c file I needed to put:
- * SQLITE_ENABLE_UPDATE_DELETE_LIMIT=1
- * in the build options.
- *
- * Or you can use a build define like: SQLITE_DEBUG 0
- *
- */
-
-
 #pragma once
 
-#define DSQLITE_ENABLE_UPDATE_DELETE_LIMIT 1
 
 #include <vector>
 #include <string>
 #include "sqlite/sqlite3.h"
 #include "ofLog.h"
 #include "ofUtils.h"
-
 #include "ofxSQLiteTypeNow.h"
 #include "ofxSQLiteInsert.h"
 #include "ofxSQLiteUpdate.h"
@@ -26,9 +14,12 @@
 #include "ofxSQLiteType.h"
 #include "ofxSQLiteTypeNow.h"
 
+
 class ofxSQLiteSimpler;
 
-class ofxSQLite {
+
+class ofxSQLite
+{
 public:
     ofxSQLite();
     bool setup(const std::string& sDB);
@@ -49,10 +40,13 @@ public:
 
     int simpleQuery(const std::string& SQL);
 
-    inline ofxSQLiteTypeNow now() {
-        return ofxSQLiteTypeNow();
-    }
-    
+    bool isThreadsafe() const;
+    std::string getVersion() const;
+    std::string getSourceId() const;
+    int getVersionNumber() const;
+
+    ofxSQLiteTypeNow now() const;
+
 private:
     sqlite3* db;
     std::string db_file;

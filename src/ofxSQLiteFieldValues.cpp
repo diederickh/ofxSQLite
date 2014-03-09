@@ -8,7 +8,8 @@ ofxSQLiteFieldValues::ofxSQLiteFieldValues():
 {
 }
 
-std::size_t ofxSQLiteFieldValues::use(const std::string& sField, const ofxSQLiteValue& oValue)
+std::size_t ofxSQLiteFieldValues::use(const std::string& sField,
+                                      const ofxSQLiteValue& oValue)
 {
     switch(oValue.getType())
     {
@@ -149,6 +150,8 @@ void ofxSQLiteFieldValues::bind(sqlite3_stmt* pStatement) {
 
 int ofxSQLiteFieldValues::nextFieldIndex() {
 	_field_count++;
+
+    // field_limit = sqlite3_limit(db, SQLITE_LIMIT_VARIABLE_NUMBER, -1);
 
 	if(_field_count >= 999) // you can only insert 999 columns
     {

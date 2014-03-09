@@ -17,25 +17,49 @@ ofxSQLiteFieldValues ofxSQLiteInsert::getFields() const {
 }
 
 std::string ofxSQLiteInsert::getLiteralQuery() {
-	std::string sql = "INSERT INTO " +table +" (";
-	std::string values = ") VALUES (";
+    std::stringstream sql;
+    sql << "INSERT INTO ";
+    sql << table <<
+    sql << " (";
+
+    std::stringstream values;
+	values << ") VALUES (";
 
     field_values.begin();
 
 	while(field_values.hasNext()) {
 		FieldValuePair field = field_values.current();
+        
 		field_values.next();
 
-		sql += field.field +(field_values.hasNext() ? "," : "");
-		values += "?" +(std::string)field.indexString()+(field_values.hasNext() ? "," : "");
+        std::string delimiter = (field_values.hasNext() ? "," : "");
+
+        sql << field.field;
+        sql << delimiter;
+
+		values << "?";
+        values << field.indexString();
+        values << delimiter;
 	}
-	return sql + values +")";
+
+    sql << values << ")";
+
+	return sql.str();
 }
 
-int ofxSQLiteInsert::execute() {
+int ofxSQLiteInsert::execute()
+{
 	std::string sql = getLiteralQuery();
 	sqlite3_stmt* statement;
-	if (SQLITE_OK != sqlite3_prepare_v2(sqlite, sql.c_str(),-1, &statement, 0)) {
+
+    int err = sqlite3_prepare_v2(sqlite,
+                                 sql.c_str(),
+                                 sql.length(),
+                                 &statement,
+                                 0);
+
+	if (SQLITE_OK != err)
+    {
 		sqlite3_finalize(statement);
 		return sqlite3_errcode(sqlite);
 	}
@@ -44,7 +68,8 @@ int ofxSQLiteInsert::execute() {
 	field_values.bind(statement);
 
 	// execute the query.
-	if (SQLITE_DONE != sqlite3_step(statement)) {
+	if (SQLITE_DONE != sqlite3_step(statement))
+    {
 		sqlite3_finalize(statement);
 		return sqlite3_errcode(sqlite);
 	}
