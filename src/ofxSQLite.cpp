@@ -11,9 +11,9 @@ ofxSQLite::ofxSQLite():
 
 ofxSQLite::~ofxSQLite()
 {
-    if (db)
+    if (db && SQLITE_OK != sqlite3_close(db))
     {
-        sqlite3_close(db);
+        ofLogError("ofxSQLite::~ofxSQLite") << sqlite3_errmsg(db);
     }
 }
 
@@ -22,9 +22,9 @@ bool ofxSQLite::setup(const std::string& sDB)
 {
 	db_file = ofToDataPath(sDB, true);
 
-    if (db)
+    if (db && SQLITE_OK != sqlite3_close(db))
     {
-        sqlite3_close(db);
+            ofLogError("ofxSQLite::setup") << sqlite3_errmsg(db);
     }
 
     int err = sqlite3_open(db_file.c_str(), &db);
