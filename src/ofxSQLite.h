@@ -22,6 +22,8 @@ class ofxSQLite
 {
 public:
     ofxSQLite();
+    ~ofxSQLite();
+
     bool setup(const std::string& sDB);
 
     bool isLoaded() const;

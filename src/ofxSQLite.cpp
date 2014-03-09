@@ -9,9 +9,23 @@ ofxSQLite::ofxSQLite():
 }
 
 
+ofxSQLite::~ofxSQLite()
+{
+    if (db)
+    {
+        sqlite3_close(db);
+    }
+}
+
+
 bool ofxSQLite::setup(const std::string& sDB)
 {
 	db_file = ofToDataPath(sDB, true);
+
+    if (db)
+    {
+        sqlite3_close(db);
+    }
 
     int err = sqlite3_open(db_file.c_str(), &db);
 
