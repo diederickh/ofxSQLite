@@ -1,110 +1,56 @@
-/**
- * When compiling the sqlite.c file I needed to put:
- * SQLITE_ENABLE_UPDATE_DELETE_LIMIT=1
- * in the build options.
- *
- * Or you can use a build define like: SQLITE_DEBUG 0
- *
- */
-#ifndef OFXSQLITEH
-#define OFXSQLITEH
-#define DSQLITE_ENABLE_UPDATE_DELETE_LIMIT 1
+#pragma once
+
 
 #include <vector>
 #include <string>
-#include "lib/sqlite/sqlite3.h"
-//#include "ofMain.h"
-
+#include "sqlite/sqlite3.h"
+#include "ofLog.h"
+#include "ofUtils.h"
 #include "ofxSQLiteTypeNow.h"
-
-//
-//#include "ofxSQLite.h"
-#include "ofxSQLiteAbstract.h"
 #include "ofxSQLiteInsert.h"
 #include "ofxSQLiteUpdate.h"
 #include "ofxSQLiteDelete.h"
 #include "ofxSQLiteSelect.h"
 #include "ofxSQLiteType.h"
 #include "ofxSQLiteTypeNow.h"
-//#include "ofxSQLiteSimpler.h"
+
+
 class ofxSQLiteSimpler;
-//
-/*
-class ofxSQLiteInsert;
-class ofxSQLiteSelect;
-class ofxSQLiteUpdate;
-class ofxSQLiteDelete;
-*/
-class ofxSQLite {
-	public:
-		ofxSQLite();
-		ofxSQLite(std::string sDB);
-		void setup(std::string sDB);
-		ofxSQLiteInsert insert(std::string sTable);
-		ofxSQLiteUpdate update(std::string sTable);
-		ofxSQLiteDelete remove(std::string sTable);
-		ofxSQLiteSelect select(std::string sFields);
-		void printTable(std::string sTable);
-		
-		ofxSQLiteSimpler operator[](const std::string sKeyValue);
-		
-		int lastInsertID();
-		const char* getError();
 
-		int simpleQuery(const char* pSQL);
-		inline ofxSQLiteTypeNow now() {
-			return ofxSQLiteTypeNow();
-		}
-		
-		inline sqlite3* getSQLitePtr();		
 
-	private:
-		sqlite3* db;
-		std::string db_name;
-		std::string db_file;
-};
-
-inline sqlite3* ofxSQLite::getSQLitePtr() {
-	return db;
-}
-
-class ofxSQLiteSimpler {
+class ofxSQLite
+{
 public:
-	ofxSQLiteSimpler(ofxSQLite& rDB, string sTable)
-	:db(rDB)
-	,table(sTable)
-	{
-	}
-	
-	template<typename T>
-	ofxSQLiteSelect find(string sWhereField, T mWhereValue, string sSelectFields = "*") {
-		ofxSQLiteSelect sel = db.select(sSelectFields).from(table).where(sWhereField, mWhereValue).execute();
-		return sel;
-	}
-	
-	// example: db["pakbox_users"].findOne("pu_id", 68, "pu_name").getString(0);
-	template<typename T>
-	ofxSQLiteSelect findOne(string sWhereField, T mWhereValue, string sSelectFields = "*") {
-		ofxSQLiteSelect sel = db
-			.select(sSelectFields)
-			.from(table)
-			.where(sWhereField, mWhereValue)
-			.limit(1)
-			.execute()
-			.begin();
-		
-		return sel;
-	}
-	
-	void print(){
-		cout << db.select("*").from(table).execute().getResultAsAsciiTable();
-	}
-	
+    ofxSQLite();
+    ~ofxSQLite();
+
+    bool setup(const std::string& sDB);
+
+    bool isLoaded() const;
+
+    ofxSQLiteInsert insert(const std::string& sTable);
+    ofxSQLiteUpdate update(const std::string& sTable);
+    ofxSQLiteDelete remove(const std::string& sTable);
+    ofxSQLiteSelect select(const std::string& sFields);
+
+    void printTable(const std::string& sTable);
+
+    ofxSQLiteSimpler operator[](const std::string& sKeyValue);
+    
+    sqlite_int64 lastInsertID() const;
+    std::string getError() const;
+
+    int simpleQuery(const std::string& SQL);
+
+    bool isThreadsafe() const;
+    std::string getVersion() const;
+    std::string getSourceId() const;
+    int getVersionNumber() const;
+
+    ofxSQLiteTypeNow now() const;
+
 private:
-	ofxSQLite& db;
-	string table;
+    sqlite3* db;
+    std::string db_file;
 
 };
-
-#endif
-

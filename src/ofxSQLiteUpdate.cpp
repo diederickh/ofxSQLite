@@ -1,12 +1,12 @@
 #include "ofxSQLiteUpdate.h"
-#include "lib/sqlite/sqlite3.h"
+#include "sqlite/sqlite3.h"
 #include <iostream>
 
-ofxSQLiteUpdate::ofxSQLiteUpdate(sqlite3* pSQLite, std::string sTable):sqlite(pSQLite), table(sTable) {
+ofxSQLiteUpdate::ofxSQLiteUpdate(sqlite3* pSQLite, const std::string& sTable):sqlite(pSQLite), table(sTable) {
 }
 
 std::string ofxSQLiteUpdate::getLiteralQuery() {
-	std::string sql = "UPDATE " +table +" SET ";
+	std::string sql = "UPDATE " + table + " SET ";
 
 	field_values.begin();
 	while(field_values.hasNext()) {

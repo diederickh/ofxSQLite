@@ -1,72 +1,144 @@
 #include "ofxSQLite.h"
-#include "ofxSQLiteInsert.h"
-#include "ofxSQLiteUpdate.h"
-#include "ofxSQLiteDelete.h"
-#include "ofxSQLiteSelect.h"
-//#include "ofxSQLiteSimpler.h"
+#include "ofxSQLiteSimpler.h"
 
-ofxSQLite::ofxSQLite()
-:db_name("")
+
+ofxSQLite::ofxSQLite():
+    db(0),
+    db_file("")
 {
 }
 
-// @deprecated, use setup()
-ofxSQLite::ofxSQLite(std::string sDB):db_name(sDB) {
-	// 007 breaks using ofToDataPath()
-	//db_file = ofToDataPath(db_name,true);
-	setup(sDB);
+
+ofxSQLite::~ofxSQLite()
+{
+    if (db && SQLITE_OK != sqlite3_close(db))
+    {
+        ofLogError("ofxSQLite::~ofxSQLite") << sqlite3_errmsg(db);
+    }
 }
 
-void ofxSQLite::setup(std::string sDB) {
-	db_name = sDB;
-	db_file  = sDB; 
-	if (SQLITE_OK != sqlite3_open(db_file.c_str(), &db)) {
-		cout << sqlite3_errmsg(db);
-		exit(1);
+
+bool ofxSQLite::setup(const std::string& sDB)
+{
+	db_file = ofToDataPath(sDB, true);
+
+    if (db && SQLITE_OK != sqlite3_close(db))
+    {
+        ofLogError("ofxSQLite::setup") << sqlite3_errmsg(db);
+    }
+
+	if (SQLITE_OK != sqlite3_open(db_file.c_str(), &db))
+    {
+        ofLogError("ofxSQLite::setup") << sqlite3_errmsg(db);
+        db = 0;
+        return false;
 	}
-	cout << "opened:" << db_file << endl;
+    else
+    {
+        ofLogVerbose("ofxSQLite::setup") << "Version: " << getVersion();
+        ofLogVerbose("ofxSQLite::setup") << "Version Number: " << getVersionNumber();
+        ofLogVerbose("ofxSQLite::setup") << "SourceID: " << getSourceId();
+        ofLogVerbose("ofxSQLite::setup") << "Threadsafe: " << isThreadsafe();
+        ofLogVerbose("ofxSQLite::setup") << "Opened:" << db_file << endl;
+        return true;
+    }
+
 }
 
-int ofxSQLite::simpleQuery(const char* pSQL) {
+
+bool ofxSQLite::isLoaded() const
+{
+    return 0 != db;
+}
+
+
+int ofxSQLite::simpleQuery(const std::string& SQL)
+{
 	sqlite3_stmt* statement;
-	if (SQLITE_OK != sqlite3_prepare_v2(db, pSQL,-1, &statement, 0)) {
+
+    int err = sqlite3_prepare_v2(db, SQL.c_str(), SQL.length(), &statement, 0);
+
+	if (SQLITE_OK != err)
+    {
+        sqlite3_finalize(statement);
 		return sqlite3_errcode(db);
 	}
-	while(SQLITE_ROW == sqlite3_step(statement));
+
+    while(SQLITE_ROW == sqlite3_step(statement)); // consuming results
+
 	return sqlite3_finalize(statement);
 }
 
-ofxSQLiteInsert ofxSQLite::insert(std::string sTable) {
-	ofxSQLiteInsert insert = ofxSQLiteInsert(db, sTable);
-	return insert;
+
+ofxSQLiteInsert ofxSQLite::insert(const std::string& sTable) {
+	return ofxSQLiteInsert(db, sTable);
 }
-ofxSQLiteUpdate ofxSQLite::update(std::string sTable) {
+
+
+ofxSQLiteUpdate ofxSQLite::update(const std::string& sTable) {
 	return ofxSQLiteUpdate(db, sTable);
 }
 
-ofxSQLiteDelete ofxSQLite::remove(std::string sTable) {
+
+ofxSQLiteDelete ofxSQLite::remove(const std::string& sTable) {
 	return ofxSQLiteDelete(db, sTable);
 }
 
-ofxSQLiteSelect	ofxSQLite::select(std::string sFields) {
-	ofxSQLiteSelect select = ofxSQLiteSelect(db);
-	select.select(sFields);
-	return select;
+
+ofxSQLiteSelect	ofxSQLite::select(const std::string& sFields) {
+	return ofxSQLiteSelect(db).select(sFields);;
 }
 
-const char* ofxSQLite::getError() {
-	return sqlite3_errmsg(db);
+
+ofxSQLiteTypeNow ofxSQLite::now() const
+{
+    return ofxSQLiteTypeNow();
 }
 
-int ofxSQLite::lastInsertID() {
+
+std::string ofxSQLite::getError() const {
+    const char* err = sqlite3_errmsg(db);
+    return err ? err : "Unknown Error";
+}
+
+
+sqlite_int64 ofxSQLite::lastInsertID() const {
 	return sqlite3_last_insert_rowid(db);
 }
 
-ofxSQLiteSimpler ofxSQLite::operator[](const std::string sKeyValue)  {
-	ofxSQLiteSimpler simple(*this, sKeyValue);
-	return simple;
+
+ofxSQLiteSimpler ofxSQLite::operator[](const std::string& sKeyValue) {
+	return ofxSQLiteSimpler(*this, sKeyValue);
 }
 
-void ofxSQLite::printTable(std::string sTable) {
-	cout << select("*").from(sTable).execute().getResultAsAsciiTable();
+
+void ofxSQLite::printTable(const std::string& sTable) {
+    std::cout << select("*").from(sTable).execute().getResultAsAsciiTable();
 }
+
+
+bool ofxSQLite::isThreadsafe() const
+{
+    return sqlite3_threadsafe() != 0;
+}
+
+
+std::string ofxSQLite::getVersion() const
+{
+    const char* v = sqlite3_libversion();
+    return v ? v : "UNKNOWN";
+}
+
+
+std::string ofxSQLite::getSourceId() const
+{
+    const char* v = sqlite3_sourceid();
+    return v ? v : "UNKNOWN";
+}
+
+
+int ofxSQLite::getVersionNumber() const
+{
+    return sqlite3_libversion_number();
+}
+

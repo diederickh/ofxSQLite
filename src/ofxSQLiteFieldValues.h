@@ -1,69 +1,69 @@
-#ifndef OFXSQLITEFIELDVALUESH
-#define OFXSQLITEFIELDVALUESH
+#pragma once
+
 
 #include <vector>
 #include <string>
 #include <sstream>
-#include "lib/sqlite/sqlite3.h"
-#include "ofxSQLiteType.h"
-#include "ofxSQLiteTypeNow.h"
 #include <iostream>
 #include <stdio.h>
+#include "sqlite/sqlite3.h"
+#include "ofxSQLiteType.h"
+#include "ofxSQLiteTypeNow.h"
+#include "ofFileUtils.h"
+#include "ofLog.h"
+#include "ofUtils.h"
 
-enum OperatorType {
-	 OP_GREATER_THAN
-	,OP_GREATER_EQUAL_THAN
-	,OP_LESS_THAN
-	,OP_LESS_EQUAL_THAN
-	,OP_LIKE
-	,OP_EQUAL
+
+enum
+{
+    OP_GREATER_THAN,
+    OP_GREATER_EQUAL_THAN,
+    OP_LESS_THAN,
+    OP_LESS_EQUAL_THAN,
+    OP_LIKE,
+    OP_EQUAL
 };
 
-struct FieldValuePair {
-	std::string field;
-	std::string value_string;
-	int value_int;
+struct FieldValuePair
+{
+    // Values
+    ofBuffer value_blob;
 	double value_double;
-	long value_long;
-	uint64_t value_uint64;
+	int value_int;
+    sqlite3_int64 value_int64;
+	std::string value_text;
+
+    // Statements
+    std::string field;
 	int index;
 	int type;
+
 	int sql_operator;
 	
-	void bind(sqlite3_stmt* pStatement) {
-		int result = SQLITE_OK;
-		switch(type) {
-			case OFX_SQLITE_TYPE_INT:	{
-				result = sqlite3_bind_int(pStatement, index, value_int);
-				break;
-			}
-			case OFX_SQLITE_TYPE_LONG: {
-				result = sqlite3_bind_int64(pStatement,index, value_long); 
-				break;
-			}
-			case OFX_SQLITE_TYPE_INT64: {	
-				result = sqlite3_bind_int64(pStatement,index, value_uint64); 
-				break;
-			}
-			case OFX_SQLITE_TYPE_TEXT: {
-				result = sqlite3_bind_text(
-						 	pStatement
-						 	,index
-						 	,value_string.c_str()
-						 	,value_string.size()
-						 	,SQLITE_STATIC
-				); 
-				break;
-			}
-			case OFX_SQLITE_TYPE_DOUBLE: {	
-				result = sqlite3_bind_double(pStatement, index, value_double);
-				break;
-			}
-			default:break;
-		}
-
-		if(result != SQLITE_OK) {
-			printf("SQLITE: Error while binding parameter: %d\n", index);
+	int bind(sqlite3_stmt* pStatement)
+    {
+		switch(type)
+        {
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_BLOB:
+				return sqlite3_bind_blob(pStatement,
+                                         index,
+                                         value_blob.getBinaryBuffer(),
+                                         value_blob.size(),
+                                         SQLITE_STATIC);
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_DOUBLE:
+				return sqlite3_bind_double(pStatement, index, value_double);
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_INT:
+				return sqlite3_bind_int(pStatement, index, value_int);
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_INT64:
+				return sqlite3_bind_int64(pStatement, index, value_int64);
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_NULL:
+				return sqlite3_bind_null(pStatement, index);
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_TEXT:
+				return sqlite3_bind_text(pStatement,
+                                         index,
+                                         value_text.c_str(),
+                                         value_text.size(),
+                                         SQLITE_STATIC);
 		}
 	}
 	
@@ -71,42 +71,42 @@ struct FieldValuePair {
 		sql_operator = op;
 	}
 			  
-	std::string getFieldAndValueForQuery(bool embedValue = false) {
+	std::string getFieldAndValueForQuery(bool embedValue = false) const
+    {
 		std::string result = "";
 		std::string value_part = "";
 		
 		// create value part.
-		if(embedValue) {
-			value_part = "\"" +valueString() +"\"";
+		if(embedValue)
+        {
+			value_part = "\"" + valueString() + "\"";
 		}
-		else {
-			value_part = " ?" +indexString() +" ";
+		else
+        {
+			value_part = " ?" + indexString() + " ";
 		}
 		
 		// create field + value part.
-		switch(sql_operator) {
-			case OP_GREATER_THAN: {
-				result = field +" > " +value_part;
+		switch(sql_operator)
+        {
+			case OP_GREATER_THAN:
+				result = field + " > " + value_part;
 				break;
-			}
-			case OP_GREATER_EQUAL_THAN: {
-				result = field +" >= "  +value_part;
+			case OP_GREATER_EQUAL_THAN:
+            	result = field + " >= "  + value_part;
 				break;
-			}
-			case OP_LESS_THAN: {
-				result = field +" < " +value_part;
+			case OP_LESS_THAN:
+				result = field + " < " + value_part;
 				break;
-			}
-			case OP_LESS_EQUAL_THAN: {
-				result = field +" <= " +value_part;
+			case OP_LESS_EQUAL_THAN:
+				result = field + " <= " + value_part;
 				break;
-			}
 			case OP_EQUAL:{
-				result = field +" = " +value_part;	
+				result = field + " = " + value_part;
 				break;	
 			}
 			case OP_LIKE: {
-				result = field + " LIKE " +value_part;
+				result = field + " LIKE " + value_part;
 				break;
 			}
 			default:{
@@ -114,70 +114,61 @@ struct FieldValuePair {
 				break;
 			}
 		}
+
 		return result;
 	}
 
-	std::string indexString() {
-		std::stringstream ss;
-		ss << index;
-		return ss.str();
+	std::string indexString() const {
+		return ofToString(index);
 	}
 	
-	std::string valueString() {
-		std::string result = "";
-		switch(type) {
-			case OFX_SQLITE_TYPE_INT: {
-				std::stringstream ss;					
-				ss << value_int;
-				result = ss.str();
-				break;
-			}
-			case OFX_SQLITE_TYPE_LONG: {
-				std::stringstream ss;					
-				ss << value_long;
-				result = ss.str();
-				break;
-			}
-			case OFX_SQLITE_TYPE_INT64: {
-				std::stringstream ss;					
-				ss << value_uint64;
-				result = ss.str();
-				break;
-			}
-			case OFX_SQLITE_TYPE_TEXT: {
-				result = value_string;
-				break;
-			}
+	std::string valueString() const
+    {
+		switch(type)
+        {
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_BLOB:
+                return value_blob.getText();
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_DOUBLE:
+                return ofToString(value_double);
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_INT:
+                return ofToString(value_int);
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_INT64:
+                return ofToString(value_int64);
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_NULL:
+                return "";
+			case ofxSQLiteValue::OFX_SQLITE_TYPE_TEXT:
+                return value_text;
 		}
-		return result;
 	}
 };
 
 class ofxSQLiteFieldValues {
-	public:
-		ofxSQLiteFieldValues();
-		int use(std::string sField, int nValue);
-		int use(std::string sField, unsigned long nValue);
-		int use(std::string sField, uint64_t nValue );
-		int use(std::string sField, float nValue);
-		int use(std::string sField, long nValue);
-		int use(std::string sField, double nValue);
-		int use(std::string sField, std::string sValue);
-		int use(std::string sField, ofxSQLiteType& oValue);
-		int use(std::string sField);
-		void bind(sqlite3_stmt* pStatement);
+public:
+    ofxSQLiteFieldValues();
 
-		FieldValuePair& at(int nIndex);
-		void begin();
-		FieldValuePair current();
-		void next();
-		bool hasNext();
-		int size();
+    std::size_t use(const std::string& sField, const ofxSQLiteValue& oValue);
+    std::size_t use(const std::string& sField, const ofBuffer& blob);
+    std::size_t use(const std::string& sField, double nValue);
+    std::size_t use(const std::string& sField, int nValue);
+    std::size_t use(const std::string& sField, sqlite3_int64 nValue );
+    std::size_t use(const std::string& sField);
+    std::size_t use(const std::string& sField, const std::string& sValue);
 
-	private:
-		std::vector<FieldValuePair> field_values;
-		int nextFieldIndex();
-		int _index;
+    void bind(sqlite3_stmt* pStatement);
+
+    FieldValuePair& at(std::size_t nIndex);
+    const FieldValuePair& at(std::size_t nIndex) const;
+
+    void begin();
+    FieldValuePair current() const;
+    void next();
+    bool hasNext() const;
+    std::size_t size() const;
+
+private:
+    std::size_t _field_count;
+
+    int nextFieldIndex();
+    std::vector<FieldValuePair> _field_values;
+    std::size_t _index;
 };
-
-#endif
